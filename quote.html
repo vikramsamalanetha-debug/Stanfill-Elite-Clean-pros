@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Request a Cleaning Quote | Stanfill Elite Clean Pros</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="top">
+<div class="wrap">
+<span>Free, no-obligation quote</span>
+<a href="tel:+17316022456">Call (731) 602-2456</a>
+</div>
+</div>
+<header class="nav">
+<div class="wrap nav-row">
+<a class="brand" href="index.html">Stanfill Elite Clean Pros</a>
+<nav class="links">
+<a href="index.html">Home</a>
+<a href="services.html">Services</a>
+<a href="included.html">What’s Included</a>
+<a href="about.html">About</a>
+<a href="rewards.html">Rewards</a>
+<a class="active" href="quote.html">Quote</a>
+</nav>
+<a class="button" href="tel:+17316022456">Call Now</a>
+<button class="menu" onclick="toggleMenu()">☰</button>
+</div>
+</header>
+<main>
+<section class="page-hero">
+<div class="wrap">
+<p class="eyebrow">Request a quote</p>
+<h1>Tell us about the space</h1>
+<p>Share a few details and your preferred date. We’ll contact you to confirm the scope, price, and schedule.</p>
+</div>
+</section>
+<section class="section">
+<div class="wrap form-grid">
+<div>
+<h2>Prefer to talk?</h2>
+<p>Call <a href="tel:+17316022456">
+<strong>(731) 602-2456</strong>
+</a>. We serve Lexington and surrounding Henderson County communities.</p>
+<h3>Helpful details</h3>
+<ul class="check">
+<li>Approximate home or business size</li>
+<li>Bedrooms and bathrooms</li>
+<li>Pets or product sensitivities</li>
+<li>Recurring or one-time service</li>
+<li>Your preferred cleaning date</li>
+</ul>
+</div>
+<form class="form" onsubmit="submitQuote(event)">
+<div class="fields">
+<div class="field">
+<label for="name">Name</label>
+<input id="name" required>
+</div>
+<div class="field">
+<label for="contact">Phone or email</label>
+<input id="contact" required>
+</div>
+<div class="field full">
+<label for="address">Cleaning address</label>
+<input id="address">
+</div>
+<div class="field">
+<label for="service">Service</label>
+<select id="service">
+<option>Regular cleaning</option>
+<option>Deep cleaning</option>
+<option>Move-in / move-out</option>
+<option>Commercial cleaning</option>
+<option>Not sure</option>
+</select>
+</div>
+<div class="field">
+<label for="date">Preferred date</label>
+<input id="date" type="date">
+</div>
+<div class="field">
+<label for="bedrooms">Bedrooms</label>
+<select id="bedrooms" name="bedrooms" required>
+<option value="" selected disabled>Select bedrooms</option>
+<option value="0">0 / Studio</option>
+<option value="1">1 bedroom</option>
+<option value="2">2 bedrooms</option>
+<option value="3">3 bedrooms</option>
+<option value="4">4 bedrooms</option>
+<option value="5">5 bedrooms</option>
+<option value="6">6 bedrooms</option>
+<option value="7">7 bedrooms</option>
+</select>
+</div>
+<div class="field">
+<label for="bathrooms">Bathrooms</label>
+<select id="bathrooms" name="bathrooms" required>
+<option value="" selected disabled>Select bathrooms</option>
+<option value="0">0 bathrooms</option>
+<option value="1">1 bathroom</option>
+<option value="2">2 bathrooms</option>
+<option value="3">3 bathrooms</option>
+<option value="4">4 bathrooms</option>
+<option value="5">5 bathrooms</option>
+<option value="6">6 bathrooms</option>
+<option value="7">7 bathrooms</option>
+</select>
+</div>
+<div class="field full">
+<label for="details">Anything else we should know?</label>
+<textarea id="details" placeholder="Pets, special requests, problem areas, frequency...">
+</textarea>
+</div>
+<div class="field full">
+<button class="button" type="submit">Request My Quote</button>
+<div class="notice" role="status" aria-live="polite"></div>
+</div>
+</div>
+</form>
+</div>
+</section>
+</main>
+<footer>
+<div class="wrap">
+<div class="footer-grid">
+<div>
+<h3>Stanfill Elite Clean Pros</h3>
+<p>A cleaner space starts with a simple conversation.</p>
+</div>
+<div>
+<h3>Explore</h3>
+<a href="services.html">Services</a>
+<a href="included.html">What’s Included</a>
+<a href="about.html">About</a>
+</div>
+<div>
+<h3>Contact</h3>
+<a href="tel:+17316022456">(731) 602-2456</a>
+</div>
+</div>
+<div class="fine">© 2026 Stanfill Elite Clean Pros</div>
+</div>
+</footer>
+<script src="site.js">
+</script>
+</body>
+</html>

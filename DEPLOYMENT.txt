@@ -1,0 +1,11 @@
+STANFILL ELITE CLEAN PROS — DEPLOYMENT
+
+1. Extract this ZIP file.
+2. Replace the website files in the root of your GitHub repository with every file from this folder.
+3. Keep index.html in the repository root. Do not upload the containing folder as an extra level.
+4. Commit the changes and push them to the branch used by GitHub Pages (normally main).
+5. In GitHub, open Settings > Pages and confirm the custom domain is:
+   stanfillelitecleanpros.com
+6. After deployment, test Home, Services, What's Included, About, Rewards, and Quote.
+
+The CNAME file is included to preserve the custom domain. The quote form prepares a text message to (731) 602-2456. Customers choose 0–7 bedrooms and 0–7 bathrooms.
