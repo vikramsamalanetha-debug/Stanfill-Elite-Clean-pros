@@ -8,7 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=4">
+<link rel="stylesheet" href="styles.css?v=5">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 </head>
 <body>
 
@@ -32,9 +36,67 @@
     </button>
     <div class="nav-right">
       <a href="tel:+17316022456" class="nav-phone">(731) 602-2456</a>
+      <button class="auth-btn" id="authOpenBtn" onclick="openAuthModal()">Sign In</button>
+      <div class="account-chip" id="accountChip" onclick="openAccountPanel()" style="display:none;">
+        <span id="chipName">Account</span>
+      </div>
     </div>
   </div>
 </nav>
+
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+
+    <div id="authView">
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabLoginBtn" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="modal-tab" id="tabRegisterBtn" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <div class="modal-msg" id="authMsg"></div>
+
+      <div class="modal-panel active" id="loginPanel">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="Your password">
+        </div>
+        <button class="btn btn-primary" style="width:100%; border:none; cursor:pointer;" onclick="handleLogin()">Sign in</button>
+      </div>
+
+      <div class="modal-panel" id="registerPanel">
+        <div class="field">
+          <label for="regName">Name</label>
+          <input id="regName" type="text" placeholder="Your name">
+        </div>
+        <div class="field">
+          <label for="regEmail">Email</label>
+          <input id="regEmail" type="email" placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="regPhone">Phone</label>
+          <input id="regPhone" type="text" placeholder="Best number to reach you">
+        </div>
+        <div class="field">
+          <label for="regPassword">Password</label>
+          <input id="regPassword" type="password" placeholder="Choose a password (6+ characters)">
+        </div>
+        <button class="btn btn-primary" style="width:100%; border:none; cursor:pointer;" onclick="handleRegister()">Create account</button>
+      </div>
+    </div>
+
+    <div id="accountView" class="account-panel" style="display:none;">
+      <h3 id="acctName">—</h3>
+      <p class="since" id="acctEmail">—</p>
+      <div id="myBookingsList" style="margin: 20px 0;"></div>
+      <button class="btn btn-ghost" style="width:100%;" onclick="handleLogout()">Sign out</button>
+    </div>
+  </div>
+</div>
 
 <header class="hero hero-split">
   <div class="wrap hero-split-wrap">
@@ -420,6 +482,7 @@
             Text this request
           </a>
         </div>
+        <p class="calendar-note" id="loginGateNote">You'll need to <a href="#" onclick="openAuthModal(); return false;">sign in or create an account</a> to submit a booking request.</p>
         <button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Send availability request</button>
       </form>
     </div>
@@ -466,20 +529,162 @@
 <script src="main.js"></script>
 <script>
 /* =========================================================
-   Stanfill Elite Clean Pros — booking calendar
+   Stanfill Elite Clean Pros — accounts + booking calendar
    ---------------------------------------------------------
-   Standalone booking form with a date-picker calendar.
-   No accounts or database — booking requests are simply
-   confirmed on-page; the owner follows up by phone/text.
+   Real accounts and bookings, backed by Firebase Auth and
+   Firestore (see firebase-config.js for the project config).
+   Bookings write to a top-level "bookings" collection so the
+   crew/bookkeeping portal's dashboard can read the same data.
    ========================================================= */
 
 let selectedDate = null;
 let calYear, calMonth;
+let currentUser = null; // { uid, name, email, phone }
+
+/* ---------------- Auth state ---------------- */
+
+auth.onAuthStateChanged(async function(user){
+  const authBtn = document.getElementById('authOpenBtn');
+  const chip = document.getElementById('accountChip');
+  const loginGateNote = document.getElementById('loginGateNote');
+  const submitBtn = document.getElementById('bookingSubmitBtn');
+
+  if (user) {
+    let profile = { name: user.email, email: user.email, phone: '' };
+    try {
+      const doc = await db.collection('customers').doc(user.uid).get();
+      if (doc.exists) profile = doc.data();
+    } catch (e) { /* profile fetch failed, fall back to email */ }
+
+    currentUser = { uid: user.uid, name: profile.name || user.email, email: user.email, phone: profile.phone || '' };
+
+    authBtn.style.display = 'none';
+    chip.style.display = 'flex';
+    document.getElementById('chipName').textContent = currentUser.name.split(' ')[0];
+
+    const nameField = document.getElementById('name');
+    const phoneField = document.getElementById('phone');
+    if (nameField && !nameField.value) nameField.value = currentUser.name;
+    if (phoneField && !phoneField.value) phoneField.value = currentUser.phone || currentUser.email;
+
+    if (loginGateNote) loginGateNote.style.display = 'none';
+    if (submitBtn) submitBtn.disabled = false;
+
+    loadMyBookings();
+  } else {
+    currentUser = null;
+    authBtn.style.display = 'inline-block';
+    chip.style.display = 'none';
+    if (loginGateNote) loginGateNote.style.display = 'block';
+  }
+});
+
+/* ---------------- Modal + tabs ---------------- */
+
+function openAuthModal(){
+  document.getElementById('authView').style.display = 'block';
+  document.getElementById('accountView').style.display = 'none';
+  document.getElementById('authMsg').className = 'modal-msg';
+  document.getElementById('authModal').classList.add('open');
+}
+function openAccountPanel(){
+  document.getElementById('authView').style.display = 'none';
+  document.getElementById('accountView').style.display = 'block';
+  document.getElementById('acctName').textContent = currentUser ? currentUser.name : '—';
+  document.getElementById('acctEmail').textContent = currentUser ? currentUser.email : '—';
+  document.getElementById('authModal').classList.add('open');
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+function switchAuthTab(tab){
+  document.getElementById('tabLoginBtn').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegisterBtn').classList.toggle('active', tab === 'register');
+  document.getElementById('loginPanel').classList.toggle('active', tab === 'login');
+  document.getElementById('registerPanel').classList.toggle('active', tab === 'register');
+  document.getElementById('authMsg').className = 'modal-msg';
+}
+function showAuthMsg(text, type){
+  const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.className = 'modal-msg show ' + type;
+}
+
+/* ---------------- Register / login / logout ---------------- */
+
+async function handleRegister(){
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const password = document.getElementById('regPassword').value;
+
+  if (!name || !email || !password) {
+    showAuthMsg('Fill in your name, email, and a password.', 'error'); return;
+  }
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection('customers').doc(cred.user.uid).set({
+      name, email, phone,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('authView').style.display = 'none';
+    document.getElementById('accountView').style.display = 'block';
+  } catch (e) {
+    showAuthMsg(e.message, 'error');
+  }
+}
+
+async function handleLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { showAuthMsg('Enter your email and password.', 'error'); return; }
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    document.getElementById('authView').style.display = 'none';
+    document.getElementById('accountView').style.display = 'block';
+  } catch (e) {
+    showAuthMsg(e.message, 'error');
+  }
+}
+
+async function handleLogout(){
+  await auth.signOut();
+  closeModal('authModal');
+}
+
+/* ---------------- My bookings list ---------------- */
+
+async function loadMyBookings(){
+  const listEl = document.getElementById('myBookingsList');
+  if (!currentUser || !listEl) return;
+  listEl.innerHTML = '<p style="font-size:0.88rem;color:var(--ink-soft);">Loading your requests…</p>';
+  try {
+    const snap = await db.collection('bookings')
+      .where('uid', '==', currentUser.uid)
+      .orderBy('requestedDate', 'desc')
+      .limit(10)
+      .get();
+    if (snap.empty) {
+      listEl.innerHTML = '<p style="font-size:0.88rem;color:var(--ink-soft);">No booking requests yet.</p>';
+      return;
+    }
+    let html = '';
+    snap.forEach(doc => {
+      const b = doc.data();
+      const d = b.requestedDate ? new Date(b.requestedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+      const status = (b.status || 'pending');
+      html += '<div class="my-booking-row"><strong>' + d + '</strong> — ' + (b.service || '') +
+        '<span class="status status-' + status + '">' + status + '</span></div>';
+    });
+    listEl.innerHTML = html;
+  } catch (e) {
+    listEl.innerHTML = '<p style="font-size:0.85rem;color:var(--ink-soft);">Couldn\'t load your requests right now.</p>';
+  }
+}
 
 /* ---------------- Calendar ---------------- */
 
 function isBookedOut(date){
-  // Deterministic "fully booked" pattern so it's consistent, not random each load.
   const seed = date.getFullYear() * 372 + date.getMonth() * 31 + date.getDate();
   return date.getDay() === 0 || (seed % 7 === 3);
 }
@@ -536,15 +741,22 @@ function selectDate(y, m, d){
 
 /* ---------------- Booking submit ---------------- */
 
-function handleBookingSubmit(){
+async function handleBookingSubmit(){
   const msgEl = document.getElementById('bookingMsg');
   const sendOptions = document.getElementById('sendOptions');
+  sendOptions.style.display = 'none';
+
+  if (!currentUser) {
+    msgEl.textContent = 'Please sign in or create an account first, so we can keep you posted on this request.';
+    msgEl.className = 'modal-msg show error';
+    openAuthModal();
+    return;
+  }
+
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const service = document.getElementById('service').value;
   const details = document.getElementById('details').value.trim();
-
-  sendOptions.style.display = 'none';
 
   if (!name || !phone) {
     msgEl.textContent = 'Add your name and best contact info first.';
@@ -560,33 +772,39 @@ function handleBookingSubmit(){
   const formatted = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const joiningRewards = document.getElementById('join-rewards').checked;
 
-  const subject = 'Availability request — ' + formatted + ' (' + service + ')';
-  const bodyLines = [
-    'Name: ' + name,
-    'Contact: ' + phone,
-    'Service: ' + service,
-    'Requested date: ' + formatted,
-    'Details: ' + (details || '—'),
-    'Wants Clean Rewards: ' + (joiningRewards ? 'Yes' : 'No')
-  ];
-  const plainBody = bodyLines.join('\n');
-  const smsBody = 'Availability request — ' + formatted + ' (' + service + '). ' + name + ', ' + phone + '. ' + (details || '');
+  try {
+    await db.collection('bookings').add({
+      uid: currentUser.uid,
+      name, phone, service,
+      requestedDate: selectedDate.toISOString(),
+      details: details || '',
+      wantsRewards: joiningRewards,
+      status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
 
-  const mailto = 'mailto:hello@stanfillelitecleanpros.com' +
-    '?subject=' + encodeURIComponent(subject) +
-    '&body=' + encodeURIComponent(plainBody);
+    const rewardsMsg = joiningRewards ? ' We\'ll get you started on Clean Rewards too.' : '';
+    msgEl.textContent = 'Your ' + formatted + ' request has been sent — we\'ll confirm availability shortly.' + rewardsMsg;
+    msgEl.className = 'modal-msg show success';
+    loadMyBookings();
 
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const smsSeparator = isIOS ? '&' : '?';
-  const smsHref = 'sms:+17316022456' + smsSeparator + 'body=' + encodeURIComponent(smsBody);
-
-  document.getElementById('sendEmailBtn').setAttribute('href', mailto);
-  document.getElementById('sendTextBtn').setAttribute('href', smsHref);
-  sendOptions.style.display = 'flex';
-
-  const rewardsMsg = joiningRewards ? ' We\'ll get you started on Clean Rewards too.' : '';
-  msgEl.textContent = 'Your ' + formatted + ' request is ready — send it by email or text below, whichever\'s easier.' + rewardsMsg;
-  msgEl.className = 'modal-msg show success';
+    // Also offer email/text as a backup, in case she's not checking the dashboard yet
+    const subject = 'Availability request — ' + formatted + ' (' + service + ')';
+    const bodyLines = [
+      'Name: ' + name, 'Contact: ' + phone, 'Service: ' + service,
+      'Requested date: ' + formatted, 'Details: ' + (details || '—')
+    ];
+    const mailto = 'mailto:hello@stanfillelitecleanpros.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyLines.join('\n'));
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const smsBody = subject + '. ' + name + ', ' + phone;
+    const smsHref = 'sms:+17316022456' + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(smsBody);
+    document.getElementById('sendEmailBtn').setAttribute('href', mailto);
+    document.getElementById('sendTextBtn').setAttribute('href', smsHref);
+    sendOptions.style.display = 'flex';
+  } catch (e) {
+    msgEl.textContent = 'Something went wrong saving your request: ' + e.message;
+    msgEl.className = 'modal-msg show error';
+  }
 }
 
 /* ---------------- Init ---------------- */
