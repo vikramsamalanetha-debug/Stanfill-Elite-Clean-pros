@@ -14,6 +14,90 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<style>
+/* ===== Customer dashboard + chat assistant ===== */
+.dash{position:fixed;inset:0;z-index:1000;background:var(--cream);overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
+.dash.open{display:block}
+.dash-top{position:sticky;top:0;z-index:2;background:rgba(251,248,242,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.dash-top-in{max-width:980px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:12px}
+.dash-top b{font-family:'Fraunces',serif;font-size:1.05rem;flex:1}
+.dash-x{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font:600 .88rem 'Work Sans',sans-serif;cursor:pointer;color:var(--ink)}
+.dash-x:hover{background:var(--sage-pale)}
+.dash-in{max-width:980px;margin:0 auto;padding:24px 20px 80px}
+.dash h2{font-size:1.9rem;margin-bottom:4px}
+.dash .sub{color:var(--ink-soft);margin-bottom:22px;font-size:.98rem}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dash-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.dash-card.wide{grid-column:1/-1}
+.dash-card h3{font-size:1.15rem;margin-bottom:10px}
+.dash-next{background:var(--sage-deep);color:#fff;border-color:var(--sage-deep)}
+.dash-next h3,.dash-next .big{color:#fff}
+.dash-next .big{font-family:'Fraunces',serif;font-size:1.7rem;line-height:1.15}
+.dash-next p{color:#E4EDE3;font-size:.95rem;margin-top:6px}
+.dash-btn{display:inline-block;margin-top:14px;margin-right:8px;padding:10px 18px;border-radius:10px;font:600 .92rem 'Work Sans',sans-serif;text-decoration:none;cursor:pointer;border:1px solid var(--sage);background:var(--sage);color:#fff}
+.dash-btn.ghost{background:#fff;color:var(--sage-deep)}
+.dash-next .dash-btn{background:#fff;color:var(--sage-deep);border-color:#fff}
+.dash-next .dash-btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dash-stat{background:var(--sage-pale);border-radius:12px;padding:14px 10px;text-align:center}
+.dash-stat b{display:block;font-family:'Fraunces',serif;font-size:1.7rem;color:var(--sage-deep)}
+.dash-stat span{font-size:.78rem;color:var(--ink-soft)}
+.bar{height:12px;background:var(--sage-pale);border-radius:999px;overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sage),var(--honey));border-radius:999px;transition:width .5s}
+.tier{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:.93rem}
+.tier:last-child{border:0}
+.tier .pts{min-width:62px;font-weight:700;color:var(--sage-deep)}
+.tier.done{color:var(--ink-soft)}
+.tier.done .pts::after{content:" \2713";color:var(--sage)}
+.bk{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.bk:last-child{border:0}
+.bk-main{flex:1;min-width:0}
+.bk-main b{display:block}
+.bk-main span{font-size:.85rem;color:var(--ink-soft)}
+.pill{font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:capitalize;white-space:nowrap}
+.pill.pending{background:#FFF1D6;color:#8A5A0B}.pill.confirmed{background:var(--sage-pale);color:var(--sage-deep)}.pill.declined{background:#FBE7DF;color:#9A3B1F}
+.bk a,.bk button{font:600 .82rem 'Work Sans',sans-serif;color:var(--sage-deep);background:none;border:0;cursor:pointer;text-decoration:underline;padding:4px}
+.led{width:100%;border-collapse:collapse;font-size:.92rem}
+.led th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding:6px 4px;border-bottom:1px solid var(--line)}
+.led td{padding:9px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.led td.n{text-align:right;white-space:nowrap;font-weight:700}
+.pos{color:var(--sage-deep)}.neg{color:#9A3B1F}
+.empty{color:var(--ink-soft);font-size:.92rem;padding:6px 0}
+.dash-form label{display:block;font-size:.82rem;font-weight:600;margin:10px 0 4px}
+.dash-form input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+.dash-note{font-size:.85rem;color:var(--sage-deep);margin-top:8px;min-height:1.2em}
+.dash-credit{text-align:center;color:var(--ink-soft);font-size:.8rem;margin-top:30px}
+.dash-credit a{color:inherit}
+@media(max-width:720px){.dash-grid{grid-template-columns:1fr}.dash h2{font-size:1.55rem}}
+/* chat */
+.chat-fab{position:fixed;right:18px;bottom:18px;z-index:1100;display:none;align-items:center;gap:8px;background:var(--sage-deep);color:#fff;border:0;border-radius:999px;padding:14px 20px;font:600 .95rem 'Work Sans',sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.25);cursor:pointer}
+.chat-fab.on{display:flex}
+.chat-fab:hover{background:var(--sage)}
+.chat-box{position:fixed;right:18px;bottom:18px;z-index:1101;width:360px;max-width:calc(100vw - 24px);height:520px;max-height:calc(100vh - 36px);background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.28);display:none;flex-direction:column;overflow:hidden}
+.chat-box.open{display:flex}
+.chat-head{background:var(--sage-deep);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.chat-head b{flex:1;font-family:'Fraunces',serif;font-size:1.02rem}
+.chat-head small{display:block;font:400 .74rem 'Work Sans',sans-serif;color:#CFE0D2}
+.chat-head button{background:none;border:0;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1}
+.chat-log{flex:1;overflow-y:auto;padding:14px;background:var(--cream);display:flex;flex-direction:column;gap:9px}
+.msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:.93rem;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--sage);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.sys{align-self:stretch;max-width:100%;background:var(--sage-pale);color:var(--sage-deep);font-size:.85rem;text-align:center}
+.msg.sys button{display:block;margin:8px auto 0;background:var(--sage-deep);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 .85rem 'Work Sans',sans-serif;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{background:#fff;border:1px solid var(--sage);color:var(--sage-deep);border-radius:999px;padding:6px 12px;font:500 .82rem 'Work Sans',sans-serif;cursor:pointer}
+.chat-in{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:#fff}
+.chat-in input{flex:1;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;min-width:0}
+.chat-in button{background:var(--sage-deep);color:#fff;border:0;border-radius:10px;padding:0 16px;font:600 .9rem 'Work Sans',sans-serif;cursor:pointer}
+.chat-in button:disabled{opacity:.5}
+.chat-foot{font-size:.7rem;color:var(--ink-soft);text-align:center;padding:0 8px 8px;background:#fff}
+.chat-foot a{color:inherit}
+.dots span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--ink-soft);animation:dot 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,60%,100%{opacity:.25}30%{opacity:1}}
+@media(max-width:480px){.chat-box{right:0;bottom:0;width:100vw;max-width:100vw;height:86vh;border-radius:18px 18px 0 0}}
+</style>
 </head>
 <body>
 
@@ -523,10 +607,51 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 Stanfill Elite Clean Pros. All rights reserved.</span>
-      <span>Lexington, Tennessee &middot; Website by LIT America</span>
+      <span>Lexington, Tennessee &middot; Website by <a href="https://www.litamerica.net" target="_blank" rel="noopener" style="color:inherit">LIT America</a></span>
     </div>
   </div>
 </footer>
+
+<!-- ===== Customer dashboard ===== -->
+<div class="dash" id="dash" role="dialog" aria-label="My account">
+  <div class="dash-top"><div class="dash-top-in">
+    <b>Stanfill Elite Clean Pros</b>
+    <button class="dash-x" onclick="closeDash()">Back to website</button>
+    <button class="dash-x" onclick="handleLogout()">Sign out</button>
+  </div></div>
+  <div class="dash-in">
+    <h2 id="dHello">Welcome</h2>
+    <p class="sub" id="dSub">Your cleanings, rewards and account, all in one place.</p>
+    <div class="dash-grid">
+      <div class="dash-card dash-next" id="dNext"></div>
+      <div class="dash-card"><h3>At a glance</h3><div class="dash-stats" id="dStats"></div>
+        <p class="empty" style="margin-top:12px">Questions? Call <a href="tel:+17316022456" style="color:var(--sage-deep)">(731) 602-2456</a> or tap the chat button below.</p></div>
+      <div class="dash-card wide" id="dRewards"></div>
+      <div class="dash-card wide"><h3>My bookings</h3><div id="dBookings"></div></div>
+      <div class="dash-card wide"><h3>Points activity</h3><div id="dLedger"></div></div>
+      <div class="dash-card wide dash-form"><h3>My details</h3>
+        <label for="pName">Name</label><input id="pName" type="text" autocomplete="name">
+        <label for="pPhone">Phone</label><input id="pPhone" type="text" autocomplete="tel">
+        <label>Email</label><input id="pEmail" type="text" disabled>
+        <button class="dash-btn" onclick="saveProfile()">Save details</button>
+        <div class="dash-note" id="pNote"></div></div>
+    </div>
+    <p class="dash-credit">A product of <a href="https://www.litamerica.net" target="_blank" rel="noopener">LIT America</a></p>
+  </div>
+</div>
+
+<!-- ===== Chat assistant ===== -->
+<button class="chat-fab" id="chatFab" onclick="openChat()" aria-label="Chat with our assistant">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> Ask us anything</button>
+<div class="chat-box" id="chatBox" role="dialog" aria-label="Chat assistant">
+  <div class="chat-head"><b>Stanfill Assistant<small>AI helper &middot; the owner confirms every booking</small></b><button onclick="closeChat()" aria-label="Close chat">&times;</button></div>
+  <div class="chat-log" id="chatLog"></div>
+  <form class="chat-in" onsubmit="return sendChat(event)">
+    <input id="chatInput" type="text" maxlength="600" placeholder="Type your question…" autocomplete="off">
+    <button id="chatSend" type="submit">Send</button>
+  </form>
+  <div class="chat-foot">AI can make mistakes. For anything important call (731) 602-2456. &middot; <a href="https://www.litamerica.net" target="_blank" rel="noopener">LIT America</a></div>
+</div>
 
 <script src="main.js"></script>
 <script>
@@ -573,7 +698,9 @@ auth.onAuthStateChanged(async function(user){
     if (submitBtn) submitBtn.disabled = false;
 
     loadMyBookings();
+    startDash();
   } else {
+    stopDash(); closeDash();
     currentUser = null;
     authBtn.style.display = 'inline-block';
     chip.style.display = 'none';
@@ -587,13 +714,6 @@ function openAuthModal(){
   document.getElementById('authView').style.display = 'block';
   document.getElementById('accountView').style.display = 'none';
   document.getElementById('authMsg').className = 'modal-msg';
-  document.getElementById('authModal').classList.add('open');
-}
-function openAccountPanel(){
-  document.getElementById('authView').style.display = 'none';
-  document.getElementById('accountView').style.display = 'block';
-  document.getElementById('acctName').textContent = currentUser ? currentUser.name : '—';
-  document.getElementById('acctEmail').textContent = currentUser ? currentUser.email : '—';
   document.getElementById('authModal').classList.add('open');
 }
 function closeModal(id){
@@ -627,10 +747,11 @@ async function handleRegister(){
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     await db.collection('customers').doc(cred.user.uid).set({
       name, email, phone,
+      businessId: BUSINESS_ID,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    document.getElementById('authView').style.display = 'none';
-    document.getElementById('accountView').style.display = 'block';
+    closeModal('authModal');
+    setTimeout(openAccountPanel, 400);
   } catch (e) {
     showAuthMsg(e.message, 'error');
   }
@@ -642,8 +763,8 @@ async function handleLogin(){
   if (!email || !password) { showAuthMsg('Enter your email and password.', 'error'); return; }
   try {
     await auth.signInWithEmailAndPassword(email, password);
-    document.getElementById('authView').style.display = 'none';
-    document.getElementById('accountView').style.display = 'block';
+    closeModal('authModal');
+    setTimeout(openAccountPanel, 400);
   } catch (e) {
     showAuthMsg(e.message, 'error');
   }
@@ -663,8 +784,6 @@ async function loadMyBookings(){
   try {
     const snap = await db.collection('bookings')
       .where('uid', '==', currentUser.uid)
-      .orderBy('requestedDate', 'desc')
-      .limit(10)
       .get();
     if (snap.empty) {
       listEl.innerHTML = '<p style="font-size:0.88rem;color:var(--ink-soft);">No booking requests yet.</p>';
@@ -808,6 +927,248 @@ async function handleBookingSubmit(){
     msgEl.textContent = 'Something went wrong saving your request: ' + e.message;
     msgEl.className = 'modal-msg show error';
   }
+}
+
+/* ---------------- Customer dashboard ---------------- */
+
+const BUSINESS_ID = 'stanfill-elite-clean-pros';
+const REWARD_TIERS = [
+  { p: 100, t: '$10 off your next booking' },
+  { p: 250, t: 'A free add-on (fridge, oven or interior windows)' },
+  { p: 500, t: '20% off a full clean' },
+  { p: 1000, t: 'A free standard clean' }
+];
+let dashUnsubs = [];
+let dash = { bookings: [], ledger: [], profile: {}, loaded: {} };
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function dayOf(iso){ const d = new Date(iso); return isNaN(d) ? null : d; }
+function fmtDay(d, long){ return d ? d.toLocaleDateString('en-US', long ? { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
+function calLink(b){
+  const d = dayOf(b.requestedDate); if (!d) return '#';
+  const p = n => String(n).padStart(2, '0');
+  const s = d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
+  const e = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+  const en = e.getFullYear() + p(e.getMonth() + 1) + p(e.getDate());
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent((b.service || 'Cleaning') + ' — Stanfill Elite Clean Pros') +
+    '&dates=' + s + '/' + en + '&details=' + encodeURIComponent('Questions? Call (731) 602-2456');
+}
+
+function startDash(){
+  stopDash();
+  if (!currentUser) return;
+  const uid = currentUser.uid;
+  dash = { bookings: [], ledger: [], profile: {}, loaded: {} };
+  const watch = (key, ref, map) => dashUnsubs.push(ref.onSnapshot(s => { dash[key] = map(s); dash.loaded[key] = true; renderDash(); },
+    () => { dash.loaded[key] = 'err'; renderDash(); }));
+  watch('bookings', db.collection('bookings').where('uid', '==', uid), s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+  watch('ledger', db.collection('pointsLedger').where('uid', '==', uid), s => s.docs.map(d => ({ id: d.id, ...d.data() })));
+  watch('profile', db.collection('customers').doc(uid), s => s.exists ? s.data() : {});
+}
+function stopDash(){ dashUnsubs.forEach(u => { try { u(); } catch (e) {} }); dashUnsubs = []; }
+
+function openAccountPanel(){
+  if (!currentUser) { openAuthModal(); return; }
+  closeModal('authModal');
+  document.getElementById('pName').value = currentUser.name || '';
+  document.getElementById('pPhone').value = currentUser.phone || '';
+  document.getElementById('pEmail').value = currentUser.email || '';
+  document.getElementById('pNote').textContent = '';
+  document.getElementById('dash').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDash();
+}
+function closeDash(){ document.getElementById('dash').classList.remove('open'); document.body.style.overflow = ''; }
+
+function renderDash(){
+  if (!currentUser) return;
+  const first = (currentUser.name || '').split(' ')[0] || 'there';
+  document.getElementById('dHello').textContent = 'Hi, ' + first + ' 👋';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const all = dash.bookings.slice().sort((a, b) => String(b.requestedDate).localeCompare(String(a.requestedDate)));
+  const upcoming = all.filter(b => b.status === 'confirmed' && dayOf(b.requestedDate) >= today).sort((a, b) => String(a.requestedDate).localeCompare(String(b.requestedDate)));
+  const pending = all.filter(b => (b.status || 'pending') === 'pending' && dayOf(b.requestedDate) >= today);
+  const done = all.filter(b => b.status === 'confirmed' && dayOf(b.requestedDate) < today);
+  const isMember = !!(dash.profile && dash.profile.rewardsMember);
+  const rows = dash.ledger.slice().sort((a, b) => ((a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0) - (b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0)));
+  let run = 0; rows.forEach(r => { run += Number(r.delta) || 0; r._bal = run; });
+  const balance = Math.max(0, run);
+
+  // next visit
+  const nx = upcoming[0];
+  let nextHtml;
+  if (nx) {
+    nextHtml = '<h3>Your next clean</h3><div class="big">' + esc(fmtDay(dayOf(nx.requestedDate), true)) + '</div><p>' + esc(nx.service || 'Cleaning') + ' &middot; confirmed ✓</p>' +
+      '<a class="dash-btn" href="' + esc(calLink(nx)) + '" target="_blank" rel="noopener">Add to calendar</a><a class="dash-btn ghost" href="tel:+17316022456">Need to change it? Call us</a>';
+  } else if (pending.length) {
+    const p = pending[pending.length - 1];
+    nextHtml = '<h3>Request sent</h3><div class="big">' + esc(fmtDay(dayOf(p.requestedDate), true)) + '</div><p>' + esc(p.service || 'Cleaning') + ' &middot; waiting for confirmation. You’ll get an email as soon as it’s approved.</p>';
+  } else {
+    nextHtml = '<h3>Nothing scheduled</h3><div class="big">Ready for a fresh home?</div><p>Pick a day and we’ll take it from there.</p><button class="dash-btn" onclick="bookNow()">Book a cleaning</button>';
+  }
+  document.getElementById('dNext').innerHTML = nextHtml;
+
+  document.getElementById('dStats').innerHTML =
+    '<div class="dash-stat"><b>' + upcoming.length + '</b><span>Upcoming</span></div>' +
+    '<div class="dash-stat"><b>' + done.length + '</b><span>Cleanings</span></div>' +
+    '<div class="dash-stat"><b>' + (isMember ? balance : '—') + '</b><span>Points</span></div>';
+
+  // rewards
+  let rw = '<h3>Clean Rewards</h3>';
+  if (!isMember) {
+    rw += '<p class="sub" style="margin-bottom:10px">Earn 1 point for every $1 you spend once a clean is paid, then trade points for discounts and free extras. It’s free to join.</p>' +
+      '<button class="dash-btn" style="margin-top:0" onclick="joinRewards()">Join Clean Rewards</button><div class="dash-note" id="joinNote"></div>';
+  } else {
+    const next = REWARD_TIERS.find(t => t.p > balance);
+    const prev = REWARD_TIERS.slice().reverse().find(t => t.p <= balance);
+    const base = prev ? prev.p : 0;
+    const pct = next ? Math.max(4, Math.round((balance - base) / (next.p - base) * 100)) : 100;
+    rw += '<div style="display:flex;align-items:baseline;gap:8px"><span class="big" style="font-family:Fraunces,serif;font-size:2.2rem;color:var(--sage-deep)">' + balance + '</span><span style="color:var(--ink-soft)">points</span></div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+      '<p class="empty">' + (next ? '<b>' + (next.p - balance) + ' more points</b> to unlock: ' + esc(next.t) : 'You’ve unlocked every reward. Thank you!') + '</p>' +
+      '<div style="margin-top:8px">' + REWARD_TIERS.map(t => '<div class="tier' + (balance >= t.p ? ' done' : '') + '"><span class="pts">' + t.p + ' pts</span><span>' + esc(t.t) + '</span></div>').join('') + '</div>' +
+      '<p class="empty" style="margin-top:8px">To use a reward, just mention it when you book — we’ll apply it.</p>';
+  }
+  document.getElementById('dRewards').innerHTML = rw;
+
+  // bookings
+  const bl = document.getElementById('dBookings');
+  if (dash.loaded.bookings === 'err') bl.innerHTML = '<p class="empty">Couldn’t load your bookings right now.</p>';
+  else if (!all.length) bl.innerHTML = '<p class="empty">No bookings yet. When you send a request it will show up here.</p><button class="dash-btn" onclick="bookNow()">Book a cleaning</button>';
+  else bl.innerHTML = all.map(b => {
+    const st = b.status || 'pending';
+    const d = dayOf(b.requestedDate);
+    const extra = st === 'confirmed' && d >= today ? '<a href="' + esc(calLink(b)) + '" target="_blank" rel="noopener">Add to calendar</a>' : '';
+    return '<div class="bk"><div class="bk-main"><b>' + esc(fmtDay(d)) + '</b><span>' + esc(b.service || 'Cleaning') + '</span></div>' + extra +
+      '<button onclick="rebook(\'' + esc(b.id) + '\')">Book again</button><span class="pill ' + esc(st) + '">' + esc(st) + '</span></div>';
+  }).join('');
+
+  // ledger
+  const ll = document.getElementById('dLedger');
+  if (!isMember) ll.innerHTML = '<p class="empty">Join Clean Rewards above and every paid clean will show up here as points.</p>';
+  else if (!rows.length) ll.innerHTML = '<p class="empty">No points yet. They’re added after a clean is completed and paid.</p>';
+  else ll.innerHTML = '<table class="led"><tr><th>Date</th><th>Activity</th><th style="text-align:right">Points</th><th style="text-align:right">Balance</th></tr>' +
+    rows.slice().reverse().map(r => {
+      const ms = r.createdAt && r.createdAt.toMillis ? r.createdAt.toMillis() : null;
+      const dl = Number(r.delta) || 0;
+      return '<tr><td>' + esc(ms ? fmtDay(new Date(ms)) : '—') + '</td><td>' + esc(r.reason || '') + '</td><td class="n ' + (dl >= 0 ? 'pos' : 'neg') + '">' + (dl > 0 ? '+' : '') + dl + '</td><td class="n">' + r._bal + '</td></tr>';
+    }).join('') + '</table>';
+}
+
+async function joinRewards(){
+  const note = document.getElementById('joinNote');
+  try {
+    await db.collection('customers').doc(currentUser.uid).set({ rewardsMember: true, businessId: BUSINESS_ID, rewardsJoinedAt: firebase.firestore.FieldValue.serverTimestamp(), rewardsBusinessId: BUSINESS_ID }, { merge: true });
+  } catch (e) { if (note) note.textContent = 'Couldn’t join right now. Please try again.'; }
+}
+async function saveProfile(){
+  const note = document.getElementById('pNote');
+  const name = document.getElementById('pName').value.trim();
+  const phone = document.getElementById('pPhone').value.trim();
+  if (!name) { note.textContent = 'Please enter your name.'; return; }
+  try {
+    await db.collection('customers').doc(currentUser.uid).set({ name, phone }, { merge: true });
+    currentUser.name = name; currentUser.phone = phone;
+    document.getElementById('chipName').textContent = name.split(' ')[0];
+    note.textContent = 'Saved ✓';
+  } catch (e) { note.textContent = 'Couldn’t save right now.'; }
+}
+function goBook(){
+  closeDash();
+  const el = document.getElementById('contact');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function bookNow(){ goBook(); }
+function rebook(id){
+  const b = dash.bookings.find(x => x.id === id);
+  if (b && b.service) document.getElementById('service').value = b.service;
+  goBook();
+  const m = document.getElementById('bookingMsg');
+  m.textContent = 'Pick a new date below, then send your request.'; m.className = 'modal-msg show success';
+}
+
+/* ---------------- Chat assistant ---------------- */
+
+const CHAT_URL = 'https://us-central1-stanfill-clean-pros.cloudfunctions.net/chat';
+let chatHistory = [];
+let chatBusy = false;
+let chatStarted = false;
+
+(async function chatProbe(){
+  try {
+    const r = await fetch(CHAT_URL); const j = await r.json();
+    if (j && j.enabled) document.getElementById('chatFab').classList.add('on');
+  } catch (e) { /* chat stays hidden */ }
+})();
+
+function chatAdd(cls, text){
+  const el = document.createElement('div'); el.className = 'msg ' + cls; el.textContent = text;
+  const log = document.getElementById('chatLog'); log.appendChild(el); log.scrollTop = log.scrollHeight; return el;
+}
+function openChat(){
+  document.getElementById('chatBox').classList.add('open');
+  document.getElementById('chatFab').classList.remove('on');
+  if (!chatStarted) {
+    chatStarted = true;
+    chatAdd('bot', 'Hi! I can answer questions about our cleaning services, help you pick a day, or check your rewards points. What can I help with?');
+    const chips = document.createElement('div'); chips.className = 'chips'; chips.id = 'chatChips';
+    ['How does booking work?', 'What does a deep clean include?', 'Tell me about Clean Rewards', 'I’d like to book a cleaning'].forEach(q => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = q; b.onclick = () => { askChat(q); };
+      chips.appendChild(b);
+    });
+    document.getElementById('chatLog').appendChild(chips);
+  }
+  setTimeout(() => document.getElementById('chatInput').focus(), 50);
+}
+function closeChat(){
+  document.getElementById('chatBox').classList.remove('open');
+  document.getElementById('chatFab').classList.add('on');
+}
+function sendChat(ev){
+  ev.preventDefault();
+  const inp = document.getElementById('chatInput'); const t = inp.value.trim();
+  if (t) { inp.value = ''; askChat(t); }
+  return false;
+}
+async function askChat(text){
+  if (chatBusy) return;
+  const chips = document.getElementById('chatChips'); if (chips) chips.remove();
+  chatBusy = true; document.getElementById('chatSend').disabled = true;
+  chatAdd('me', text); chatHistory.push({ role: 'user', content: text });
+  const typing = chatAdd('bot', ''); typing.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
+  try {
+    let idToken = null;
+    try { if (auth.currentUser) idToken = await auth.currentUser.getIdToken(); } catch (e) {}
+    const r = await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory.slice(-12), idToken, businessId: BUSINESS_ID }) });
+    const j = await r.json();
+    typing.remove();
+    if (j.disabled) { chatAdd('bot', 'Chat is offline right now. Please call (731) 602-2456 and we’ll help.'); }
+    else if (j.reply) {
+      chatAdd('bot', j.reply); chatHistory.push({ role: 'assistant', content: j.reply });
+      if (j.prefill) applyPrefill(j.prefill);
+    } else chatAdd('bot', j.error || 'Sorry, something went wrong. Please call (731) 602-2456.');
+  } catch (e) {
+    typing.remove(); chatAdd('bot', 'I couldn’t connect just now. Please try again, or call (731) 602-2456.');
+  }
+  chatBusy = false; document.getElementById('chatSend').disabled = false;
+  document.getElementById('chatInput').focus();
+}
+function applyPrefill(p){
+  const bits = [];
+  if (p.service) { document.getElementById('service').value = p.service; bits.push(p.service); }
+  if (p.notes) { const d = document.getElementById('details'); d.value = d.value ? d.value + '\n' + p.notes : p.notes; }
+  let dateNote = '';
+  if (p.date) {
+    const [y, m, d] = p.date.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    if (isBookedOut(dt)) dateNote = ' (' + fmtDay(dt) + ' shows as booked on our calendar, so please pick another open day.)';
+    else { calYear = y; calMonth = m - 1; selectDate(y, m - 1, d); bits.push(fmtDay(dt)); }
+  }
+  const el = chatAdd('sys', 'I filled in your request form: ' + (bits.join(' · ') || 'your notes') + '.' + dateNote + (currentUser ? '' : ' You’ll need to sign in to send it.'));
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Review & send';
+  b.onclick = () => { closeChat(); closeDash(); const c = document.getElementById('contact'); if (c) c.scrollIntoView({ behavior: 'smooth' }); };
+  el.appendChild(b);
 }
 
 /* ---------------- Init ---------------- */
