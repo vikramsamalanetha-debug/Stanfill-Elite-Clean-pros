@@ -1,0 +1,106 @@
+# Builds the Dazift Android app (APK) from the web app on every push to main,
+# and publishes it as the "latest" release so the phone can download it from:
+#   https://github.com/<owner>/<repo>/releases/latest/download/Dazift.apk
+# A product of LIT America — www.litamerica.net
+name: Build Android app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Arrange uploaded files into folders
+        run: |
+          mkdir -p scripts assets android-keystore
+          [ -f copy-web.js ] && cp copy-web.js scripts/copy-web.js
+          for f in icon-only.png icon-foreground.png icon-background.png splash.png splash-dark.png; do [ -f "$f" ] && cp "$f" assets/; done
+          # Signing key (accepts the old Dayshift-named file too)
+          for k in dazift-debug.keystore dayshift-debug.keystore; do [ -f "$k" ] && [ ! -f android-keystore/dazift-debug.keystore ] && cp "$k" android-keystore/dazift-debug.keystore; done
+          ls scripts assets android-keystore
+
+      - name: Install Capacitor and phone features
+        run: |
+          npm install
+          # Camera (receipt photos) and background location (crew on shift)
+          npm install @capacitor/camera@^7 @capacitor-community/background-geolocation@^1
+          # Push notifications need Firebase's Android file (google-services.json).
+          # Without it, the notification plugin would crash the app, so only add it when the file is present.
+          if [ -f google-services.json ]; then
+            npm install @capacitor/push-notifications@^7
+            echo "PUSH=yes" >> "$GITHUB_ENV"
+          else
+            echo "::warning::google-services.json not found - building WITHOUT push notifications"
+          fi
+
+      - name: Copy web app into www/
+        run: npm run build:web
+
+      - name: Create Android project
+        run: npx cap add android
+
+      - name: App icon and splash screen
+        continue-on-error: true
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#1F7A69' --splashBackgroundColor '#1F7A69'
+
+      - name: Location permissions and version number
+        run: |
+          MANIFEST=android/app/src/main/AndroidManifest.xml
+          PERMS='    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />\n    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />\n    <uses-feature android:name="android.hardware.location.gps" android:required="false" />\n    <uses-feature android:name="android.hardware.camera" android:required="false" />'
+          sed -i "s#<uses-permission android:name=\"android.permission.INTERNET\" />#&\n$PERMS#" "$MANIFEST"
+          grep -n "permission" "$MANIFEST"
+          sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]+\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n -E "versionCode|versionName" android/app/build.gradle
+
+      - name: Firebase file for push notifications
+        if: env.PUSH == 'yes'
+        run: cp google-services.json android/app/google-services.json
+
+      - name: Sync web app into Android project
+        run: npx cap sync android
+
+      - name: Build APK
+        run: |
+          # Same signing key every build, so new versions install over old ones.
+          mkdir -p ~/.android
+          cp android-keystore/dazift-debug.keystore ~/.android/debug.keystore
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../Dazift.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Dazift-apk
+          path: Dazift.apk
+
+      - name: Publish as latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-latest --cleanup-tag -y || true
+          gh release create android-latest Dazift.apk \
+            --title "Dazift Android app (build ${{ github.run_number }})" \
+            --notes "Install on your phone: open this page on the phone and tap Dazift.apk. A product of LIT America — https://www.litamerica.net" \
+            --latest
