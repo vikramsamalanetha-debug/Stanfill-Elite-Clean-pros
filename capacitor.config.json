@@ -1,0 +1,8 @@
+{
+  "appId": "net.litamerica.dazift",
+  "appName": "Dazift",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}
