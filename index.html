@@ -15,7 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <style>
-/* ===== Customer dashboard + chat assistant ===== */
+/* ===== Customer dashboard ===== */
 .dash{position:fixed;inset:0;z-index:1000;background:var(--cream);overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
 .dash.open{display:block}
 .dash-top{position:sticky;top:0;z-index:2;background:rgba(251,248,242,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
@@ -55,7 +55,9 @@
 .bk-main b{display:block}
 .bk-main span{font-size:.85rem;color:var(--ink-soft)}
 .pill{font-size:.76rem;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:capitalize;white-space:nowrap}
-.pill.pending{background:#FFF1D6;color:#8A5A0B}.pill.confirmed{background:var(--sage-pale);color:var(--sage-deep)}.pill.declined{background:#FBE7DF;color:#9A3B1F}
+.pill.pending{background:#FFF1D6;color:#8A5A0B}.pill.cancelled{background:#EEE;color:#666}.bk-note{display:block;font-size:.8rem;color:#8A5A0B;margin-top:2px}
+.chg-box{position:fixed;inset:0;z-index:1200;background:rgba(20,30,25,.45);display:none;align-items:center;justify-content:center;padding:16px}.chg-box.open{display:flex}
+.chg-card{background:#fff;border-radius:18px;max-width:420px;width:100%;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.28)}.chg-card h3{margin:0 0 6px;font-family:Fraunces,serif}.chg-card input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;margin:10px 0 4px}.chg-card .row{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}.chg-card .msg{min-height:1.2em;font-size:.85rem;color:#9A3B1F}.pill.confirmed{background:var(--sage-pale);color:var(--sage-deep)}.pill.declined{background:#FBE7DF;color:#9A3B1F}
 .bk a,.bk button{font:600 .82rem 'Work Sans',sans-serif;color:var(--sage-deep);background:none;border:0;cursor:pointer;text-decoration:underline;padding:4px}
 .led{width:100%;border-collapse:collapse;font-size:.92rem}
 .led th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding:6px 4px;border-bottom:1px solid var(--line)}
@@ -69,34 +71,6 @@
 .dash-credit{text-align:center;color:var(--ink-soft);font-size:.8rem;margin-top:30px}
 .dash-credit a{color:inherit}
 @media(max-width:720px){.dash-grid{grid-template-columns:1fr}.dash h2{font-size:1.55rem}}
-/* chat */
-.chat-fab{position:fixed;right:18px;bottom:18px;z-index:1100;display:none;align-items:center;gap:8px;background:var(--sage-deep);color:#fff;border:0;border-radius:999px;padding:14px 20px;font:600 .95rem 'Work Sans',sans-serif;box-shadow:0 10px 28px rgba(0,0,0,.25);cursor:pointer}
-.chat-fab.on{display:flex}
-.chat-fab:hover{background:var(--sage)}
-.chat-box{position:fixed;right:18px;bottom:18px;z-index:1101;width:360px;max-width:calc(100vw - 24px);height:520px;max-height:calc(100vh - 36px);background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.28);display:none;flex-direction:column;overflow:hidden}
-.chat-box.open{display:flex}
-.chat-head{background:var(--sage-deep);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:10px}
-.chat-head b{flex:1;font-family:'Fraunces',serif;font-size:1.02rem}
-.chat-head small{display:block;font:400 .74rem 'Work Sans',sans-serif;color:#CFE0D2}
-.chat-head button{background:none;border:0;color:#fff;font-size:1.5rem;cursor:pointer;line-height:1}
-.chat-log{flex:1;overflow-y:auto;padding:14px;background:var(--cream);display:flex;flex-direction:column;gap:9px}
-.msg{max-width:86%;padding:10px 13px;border-radius:14px;font-size:.93rem;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
-.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
-.msg.me{background:var(--sage);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
-.msg.sys{align-self:stretch;max-width:100%;background:var(--sage-pale);color:var(--sage-deep);font-size:.85rem;text-align:center}
-.msg.sys button{display:block;margin:8px auto 0;background:var(--sage-deep);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 .85rem 'Work Sans',sans-serif;cursor:pointer}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{background:#fff;border:1px solid var(--sage);color:var(--sage-deep);border-radius:999px;padding:6px 12px;font:500 .82rem 'Work Sans',sans-serif;cursor:pointer}
-.chat-in{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:#fff}
-.chat-in input{flex:1;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;min-width:0}
-.chat-in button{background:var(--sage-deep);color:#fff;border:0;border-radius:10px;padding:0 16px;font:600 .9rem 'Work Sans',sans-serif;cursor:pointer}
-.chat-in button:disabled{opacity:.5}
-.chat-foot{font-size:.7rem;color:var(--ink-soft);text-align:center;padding:0 8px 8px;background:#fff}
-.chat-foot a{color:inherit}
-.dots span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--ink-soft);animation:dot 1s infinite}
-.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
-@keyframes dot{0%,60%,100%{opacity:.25}30%{opacity:1}}
-@media(max-width:480px){.chat-box{right:0;bottom:0;width:100vw;max-width:100vw;height:86vh;border-radius:18px 18px 0 0}}
 </style>
 </head>
 <body>
@@ -625,7 +599,7 @@
     <div class="dash-grid">
       <div class="dash-card dash-next" id="dNext"></div>
       <div class="dash-card"><h3>At a glance</h3><div class="dash-stats" id="dStats"></div>
-        <p class="empty" style="margin-top:12px">Questions? Call <a href="tel:+17316022456" style="color:var(--sage-deep)">(731) 602-2456</a> or tap the chat button below.</p></div>
+        <p class="empty" style="margin-top:12px">Questions? Call <a href="tel:+17316022456" style="color:var(--sage-deep)">(731) 602-2456</a>.</p></div>
       <div class="dash-card wide" id="dRewards"></div>
       <div class="dash-card wide"><h3>My bookings</h3><div id="dBookings"></div></div>
       <div class="dash-card wide"><h3>Points activity</h3><div id="dLedger"></div></div>
@@ -640,17 +614,16 @@
   </div>
 </div>
 
-<!-- ===== Chat assistant ===== -->
-<button class="chat-fab" id="chatFab" onclick="openChat()" aria-label="Chat with our assistant">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg> Ask us anything</button>
-<div class="chat-box" id="chatBox" role="dialog" aria-label="Chat assistant">
-  <div class="chat-head"><b>Stanfill Assistant<small>AI helper &middot; the owner confirms every booking</small></b><button onclick="closeChat()" aria-label="Close chat">&times;</button></div>
-  <div class="chat-log" id="chatLog"></div>
-  <form class="chat-in" onsubmit="return sendChat(event)">
-    <input id="chatInput" type="text" maxlength="600" placeholder="Type your question…" autocomplete="off">
-    <button id="chatSend" type="submit">Send</button>
-  </form>
-  <div class="chat-foot">AI can make mistakes. For anything important call (731) 602-2456. &middot; <a href="https://www.litamerica.net" target="_blank" rel="noopener">LIT America</a></div>
+<!-- Change a booking's date -->
+<div class="chg-box" id="chgBox" role="dialog" aria-modal="true" aria-labelledby="chgTitle">
+  <div class="chg-card">
+    <h3 id="chgTitle">Change your date</h3>
+    <p class="sub" id="chgInfo" style="margin:0"></p>
+    <input type="date" id="chgDate" aria-label="New date">
+    <div class="msg" id="chgMsg"></div>
+    <p class="sub" style="margin:6px 0 0;font-size:.85rem">Your current date stays booked until we confirm the new one by email.</p>
+    <div class="row"><button class="dash-btn ghost" style="margin:0" onclick="closeChange()">Never mind</button><button class="dash-btn" style="margin:0" id="chgSave" onclick="saveChange()">Request new date</button></div>
+  </div>
 </div>
 
 <script src="main.js"></script>
@@ -988,6 +961,69 @@ const REWARD_TIERS = [
 let dashUnsubs = [];
 let dash = { bookings: [], ledger: [], profile: {}, loaded: {} };
 
+// Customers can change the date or cancel up to 24 hours before (counted from 8 AM on the booked day).
+const PHONE_LINK = '<a href="tel:+17316022456">call (731) 602-2456</a>';
+function changeCutoff(iso){ const t = Date.parse(iso || ''); return isNaN(t) ? 0 : t + 8 * 36e5 - 24 * 36e5; }
+function changeWaiting(b){ return !!(b.change && b.change.type === 'reschedule' && b.change.status === 'pending'); }
+function canChange(b){ return ['pending', 'confirmed'].includes(b.status || 'pending') && Date.now() < changeCutoff(b.requestedDate) && !changeWaiting(b); }
+function bookingActions(b){
+  const st = b.status || 'pending';
+  if (!['pending', 'confirmed'].includes(st) || dayOf(b.requestedDate) < new Date(new Date().setHours(0,0,0,0))) return '';
+  if (changeWaiting(b)) return '<span class="bk-note">Moving to ' + esc(fmtDay(dayOf(b.change.to))) + ' · waiting for confirmation</span>';
+  if (b.change && b.change.status === 'too_late') return '<span class="bk-note">Too close to change online. Please ' + PHONE_LINK + '.</span>';
+  if (!canChange(b)) return '<span class="bk-note">Less than 24 hours away. To change it, ' + PHONE_LINK + '.</span>';
+  return '<button onclick="openChange(\'' + esc(b.id) + '\')">Change date</button><button onclick="cancelBooking(\'' + esc(b.id) + '\')">Cancel</button>';
+}
+let chgId = null;
+function openChange(id){
+  const b = dash.bookings.find(x => x.id === id); if (!b || !canChange(b)) return;
+  chgId = id;
+  const t = new Date(); t.setDate(t.getDate() + 1);
+  const inp = document.getElementById('chgDate');
+  inp.min = ymdLocal(t); inp.value = '';
+  document.getElementById('chgInfo').textContent = (b.service || 'Cleaning') + ', now booked for ' + fmtDay(dayOf(b.requestedDate), true) + '.';
+  document.getElementById('chgMsg').textContent = '';
+  document.getElementById('chgSave').disabled = false;
+  document.getElementById('chgBox').classList.add('open');
+}
+function closeChange(){ document.getElementById('chgBox').classList.remove('open'); chgId = null; }
+async function saveChange(){
+  const b = dash.bookings.find(x => x.id === chgId); const msg = document.getElementById('chgMsg');
+  const v = document.getElementById('chgDate').value;
+  if (!b) return closeChange();
+  if (!v) { msg.textContent = 'Pick a new date.'; return; }
+  const [y, m, d] = v.split('-').map(Number); const nd = new Date(y, m - 1, d);
+  const tomorrow = new Date(); tomorrow.setHours(0,0,0,0); tomorrow.setDate(tomorrow.getDate() + 1);
+  if (nd < tomorrow) { msg.textContent = 'Pick a day from tomorrow on.'; return; }
+  if (nd.toDateString() === dayOf(b.requestedDate).toDateString()) { msg.textContent = 'That’s the day you already have.'; return; }
+  const why = closedReason(nd); if (why) { msg.textContent = fmtDay(nd) + ': ' + why.toLowerCase() + '. Please pick another day.'; return; }
+  if (!canChange(b)) { msg.innerHTML = 'It’s now less than 24 hours away. Please ' + PHONE_LINK + '.'; return; }
+  document.getElementById('chgSave').disabled = true;
+  try {
+    await db.collection('bookings').doc(b.id).update({ change: { type: 'reschedule', from: b.requestedDate, to: nd.toISOString(), at: Date.now(), status: 'pending' } });
+    closeChange();
+    alertBox('Request sent', 'We’ll email you as soon as ' + fmtDay(nd, true) + ' is confirmed. Until then, your original date stays booked.');
+  } catch (e) { document.getElementById('chgSave').disabled = false; msg.textContent = 'Couldn’t send it. Please try again or call (731) 602-2456.'; }
+}
+async function cancelBooking(id){
+  const b = dash.bookings.find(x => x.id === id); if (!b || !canChange(b)) return;
+  if (!confirm('Cancel your ' + (b.service || 'cleaning') + ' on ' + fmtDay(dayOf(b.requestedDate), true) + '?')) return;
+  try {
+    await db.collection('bookings').doc(b.id).update({ status: 'cancelled', change: { type: 'cancel', from: b.requestedDate, at: Date.now(), status: 'done' } });
+    alertBox('Booking cancelled', 'You’ll get an email confirming it. You can book another day any time.');
+  } catch (e) { alert('Couldn’t cancel it. Please try again or call (731) 602-2456.'); }
+}
+function alertBox(title, text){
+  document.getElementById('chgTitle').textContent = title;
+  document.getElementById('chgInfo').textContent = text;
+  const box = document.getElementById('chgBox');
+  box.querySelector('input').style.display = 'none'; box.querySelectorAll('.msg,.sub:not(#chgInfo),#chgSave').forEach(n => n.style.display = 'none');
+  box.querySelector('.row button').textContent = 'OK';
+  box.classList.add('open');
+  const reset = () => { document.getElementById('chgTitle').textContent = 'Change your date'; box.querySelector('input').style.display = '';
+    box.querySelectorAll('.msg,.sub,#chgSave').forEach(n => n.style.display = ''); box.querySelector('.row button').textContent = 'Never mind'; };
+  box.querySelector('.row button').addEventListener('click', reset, { once: true });
+}
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function dayOf(iso){ const d = new Date(iso); return isNaN(d) ? null : d; }
 function fmtDay(d, long){ return d ? d.toLocaleDateString('en-US', long ? { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
@@ -1046,7 +1082,8 @@ function renderDash(){
   let nextHtml;
   if (nx) {
     nextHtml = '<h3>Your next clean</h3><div class="big">' + esc(fmtDay(dayOf(nx.requestedDate), true)) + '</div><p>' + esc(nx.service || 'Cleaning') + ' &middot; confirmed ✓</p>' +
-      '<a class="dash-btn" href="' + esc(calLink(nx)) + '" target="_blank" rel="noopener">Add to calendar</a><a class="dash-btn ghost" href="tel:+17316022456">Need to change it? Call us</a>';
+      '<a class="dash-btn" href="' + esc(calLink(nx)) + '" target="_blank" rel="noopener">Add to calendar</a>' + (canChange(nx) ? '<button class="dash-btn ghost" onclick="openChange(\'' + esc(nx.id) + '\')">Change date</button><button class="dash-btn ghost" onclick="cancelBooking(\'' + esc(nx.id) + '\')">Cancel</button>' : '<a class="dash-btn ghost" href="tel:+17316022456">Need to change it? Call us</a>') +
+      (changeWaiting(nx) ? '<p style="margin-top:8px">Moving to <b>' + esc(fmtDay(dayOf(nx.change.to), true)) + '</b> · waiting for confirmation</p>' : '');
   } else if (pending.length) {
     const p = pending[pending.length - 1];
     nextHtml = '<h3>Request sent</h3><div class="big">' + esc(fmtDay(dayOf(p.requestedDate), true)) + '</div><p>' + esc(p.service || 'Cleaning') + ' &middot; waiting for confirmation. You’ll get an email as soon as it’s approved.</p>';
@@ -1086,7 +1123,8 @@ function renderDash(){
     const st = b.status || 'pending';
     const d = dayOf(b.requestedDate);
     const extra = st === 'confirmed' && d >= today ? '<a href="' + esc(calLink(b)) + '" target="_blank" rel="noopener">Add to calendar</a>' : '';
-    return '<div class="bk"><div class="bk-main"><b>' + esc(fmtDay(d)) + '</b><span>' + esc(b.service || 'Cleaning') + '</span></div>' + extra +
+    return '<div class="bk"><div class="bk-main"><b>' + esc(fmtDay(d)) + '</b><span>' + esc(b.service || 'Cleaning') + '</span>' + (changeWaiting(b) || (b.change && b.change.status === 'too_late') || (['pending','confirmed'].includes(st) && d >= today && !canChange(b)) ? bookingActions(b) : '') + '</div>' + extra +
+      (canChange(b) ? bookingActions(b) : '') +
       '<button onclick="rebook(\'' + esc(b.id) + '\')">Book again</button><span class="pill ' + esc(st) + '">' + esc(st) + '</span></div>';
   }).join('');
 
@@ -1132,90 +1170,6 @@ function rebook(id){
   goBook();
   const m = document.getElementById('bookingMsg');
   m.textContent = 'Pick a new date below, then send your request.'; m.className = 'modal-msg show success';
-}
-
-/* ---------------- Chat assistant ---------------- */
-
-const CHAT_URL = 'https://us-central1-stanfill-clean-pros.cloudfunctions.net/chat';
-let chatHistory = [];
-let chatBusy = false;
-let chatStarted = false;
-
-(async function chatProbe(){
-  try {
-    const r = await fetch(CHAT_URL); const j = await r.json();
-    if (j && j.enabled) document.getElementById('chatFab').classList.add('on');
-  } catch (e) { /* chat stays hidden */ }
-})();
-
-function chatAdd(cls, text){
-  const el = document.createElement('div'); el.className = 'msg ' + cls; el.textContent = text;
-  const log = document.getElementById('chatLog'); log.appendChild(el); log.scrollTop = log.scrollHeight; return el;
-}
-function openChat(){
-  document.getElementById('chatBox').classList.add('open');
-  document.getElementById('chatFab').classList.remove('on');
-  if (!chatStarted) {
-    chatStarted = true;
-    chatAdd('bot', 'Hi! I can answer questions about our cleaning services, help you pick a day, or check your rewards points. What can I help with?');
-    const chips = document.createElement('div'); chips.className = 'chips'; chips.id = 'chatChips';
-    ['How does booking work?', 'What does a deep clean include?', 'Tell me about Clean Rewards', 'I’d like to book a cleaning'].forEach(q => {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = q; b.onclick = () => { askChat(q); };
-      chips.appendChild(b);
-    });
-    document.getElementById('chatLog').appendChild(chips);
-  }
-  setTimeout(() => document.getElementById('chatInput').focus(), 50);
-}
-function closeChat(){
-  document.getElementById('chatBox').classList.remove('open');
-  document.getElementById('chatFab').classList.add('on');
-}
-function sendChat(ev){
-  ev.preventDefault();
-  const inp = document.getElementById('chatInput'); const t = inp.value.trim();
-  if (t) { inp.value = ''; askChat(t); }
-  return false;
-}
-async function askChat(text){
-  if (chatBusy) return;
-  const chips = document.getElementById('chatChips'); if (chips) chips.remove();
-  chatBusy = true; document.getElementById('chatSend').disabled = true;
-  chatAdd('me', text); chatHistory.push({ role: 'user', content: text });
-  const typing = chatAdd('bot', ''); typing.innerHTML = '<span class="dots"><span></span><span></span><span></span></span>';
-  try {
-    let idToken = null;
-    try { if (auth.currentUser) idToken = await auth.currentUser.getIdToken(); } catch (e) {}
-    const r = await fetch(CHAT_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: chatHistory.slice(-12), idToken, businessId: BUSINESS_ID }) });
-    const j = await r.json();
-    typing.remove();
-    if (j.disabled) { chatAdd('bot', 'Chat is offline right now. Please call (731) 602-2456 and we’ll help.'); }
-    else if (j.reply) {
-      chatAdd('bot', j.reply); chatHistory.push({ role: 'assistant', content: j.reply });
-      if (j.prefill) applyPrefill(j.prefill);
-    } else chatAdd('bot', j.error || 'Sorry, something went wrong. Please call (731) 602-2456.');
-  } catch (e) {
-    typing.remove(); chatAdd('bot', 'I couldn’t connect just now. Please try again, or call (731) 602-2456.');
-  }
-  chatBusy = false; document.getElementById('chatSend').disabled = false;
-  document.getElementById('chatInput').focus();
-}
-function applyPrefill(p){
-  const bits = [];
-  if (p.service) { document.getElementById('service').value = p.service; bits.push(p.service); }
-  if (p.notes) { const d = document.getElementById('details'); d.value = d.value ? d.value + '\n' + p.notes : p.notes; }
-  let dateNote = '';
-  if (p.date) {
-    const [y, m, d] = p.date.split('-').map(Number);
-    const dt = new Date(y, m - 1, d);
-    if (isBookedOut(dt)) dateNote = ' (' + fmtDay(dt) + ': ' + closedReason(dt).toLowerCase() + ', so please pick another day.)';
-    else { calYear = y; calMonth = m - 1; selectDate(y, m - 1, d); bits.push(fmtDay(dt)); }
-  }
-  const el = chatAdd('sys', 'I filled in your request form: ' + (bits.join(' · ') || 'your notes') + '.' + dateNote + (currentUser ? '' : ' You’ll need to sign in to send it.'));
-  const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Review & send';
-  b.onclick = () => { closeChat(); closeDash(); const c = document.getElementById('contact'); if (c) c.scrollIntoView({ behavior: 'smooth' }); };
-  el.appendChild(b);
 }
 
 /* ---------------- Init ---------------- */
