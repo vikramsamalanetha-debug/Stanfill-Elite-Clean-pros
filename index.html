@@ -818,9 +818,42 @@ async function loadMyBookings(){
 
 /* ---------------- Calendar ---------------- */
 
-// Closed on Sundays. Every other day can be requested; the owner confirms availability.
-function isBookedOut(date){
-  return date.getDay() === 0;
+// Which days customers can request is set by the owner in Dayzift (Settings → Booking calendar).
+// Until that loads (or if it can't), every day is open except the major holidays.
+const DOW_NAMES = ['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'];
+function usHolidays(y){
+  const nth=(m,dow,n)=>{ const d=new Date(y,m,1); return new Date(y,m,1+((dow-d.getDay()+7)%7)+7*(n-1)); };
+  const last=(m,dow)=>{ const d=new Date(y,m+1,0); return new Date(y,m,d.getDate()-((d.getDay()-dow+7)%7)); };
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;
+  return [['newyear',"New Year's Day",new Date(y,0,1)],['easter','Easter Sunday',new Date(y,mo-1,da)],['memorial','Memorial Day',last(4,1)],
+    ['july4','Independence Day',new Date(y,6,4)],['labor','Labor Day',nth(8,1,1)],['thanksgiving','Thanksgiving',nth(10,4,4)],
+    ['xmaseve','Christmas Eve',new Date(y,11,24)],['xmas','Christmas Day',new Date(y,11,25)]].map(([id,name,date])=>({id,name,date}));
+}
+let bookingCal = { closedWeekdays: [], holidays: usHolidays(2026).map(h => h.id), closedDates: [] };
+const ymdLocal = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+function closedReason(date){
+  if (bookingCal.closedWeekdays.includes(date.getDay())) return 'Closed ' + DOW_NAMES[date.getDay()];
+  const key = ymdLocal(date);
+  const h = usHolidays(date.getFullYear()).find(x => bookingCal.holidays.includes(x.id) && ymdLocal(x.date) === key);
+  if (h) return 'Closed for ' + h.name;
+  if (bookingCal.closedDates.includes(key)) return 'Closed';
+  return '';
+}
+function isBookedOut(date){ return !!closedReason(date); }
+function loadBookingCalendar(){
+  try {
+    db.collection('publicCalendars').doc(BUSINESS_ID).get().then(doc => {
+      if (!doc.exists) return;
+      const c = doc.data() || {};
+      bookingCal = {
+        closedWeekdays: Array.isArray(c.closedWeekdays) ? c.closedWeekdays : [],
+        holidays: Array.isArray(c.holidays) ? c.holidays : bookingCal.holidays,
+        closedDates: Array.isArray(c.closedDates) ? c.closedDates : []
+      };
+      if (selectedDate && isBookedOut(selectedDate)) selectedDate = null;
+      renderCalendar();
+    }).catch(() => {});
+  } catch (e) { /* keep the defaults */ }
 }
 
 function renderCalendar(){
@@ -843,12 +876,13 @@ function renderCalendar(){
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d);
     const past = date < today;
-    const booked = isBookedOut(date);
-    const disabled = past || booked;
+    const why = past ? '' : closedReason(date);
+    const disabled = past || !!why;
     const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
     html += '<button type="button" class="calendar-day' +
       (disabled ? ' disabled' : '') + (isSelected ? ' selected' : '') + '"' +
       (disabled ? ' disabled' : ' onclick="selectDate(' + calYear + ',' + calMonth + ',' + d + ')"') +
+      (why ? ' title="' + why.replace(/"/g, '&quot;') + '" aria-label="' + d + ', ' + why.replace(/"/g, '&quot;') + '"' : '') +
       '>' + d + '</button>';
   }
   html += '</div>';
@@ -1175,7 +1209,7 @@ function applyPrefill(p){
   if (p.date) {
     const [y, m, d] = p.date.split('-').map(Number);
     const dt = new Date(y, m - 1, d);
-    if (isBookedOut(dt)) dateNote = ' (' + fmtDay(dt) + ' shows as booked on our calendar, so please pick another open day.)';
+    if (isBookedOut(dt)) dateNote = ' (' + fmtDay(dt) + ': ' + closedReason(dt).toLowerCase() + ', so please pick another day.)';
     else { calYear = y; calMonth = m - 1; selectDate(y, m - 1, d); bits.push(fmtDay(dt)); }
   }
   const el = chatAdd('sys', 'I filled in your request form: ' + (bits.join(' · ') || 'your notes') + '.' + dateNote + (currentUser ? '' : ' You’ll need to sign in to send it.'));
@@ -1191,6 +1225,7 @@ function applyPrefill(p){
   calYear = today.getFullYear();
   calMonth = today.getMonth();
   renderCalendar();
+  loadBookingCalendar();     // then apply the owner's open days and days off
 })();
 </script>
 </body>
