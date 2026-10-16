@@ -77,28 +77,35 @@
 
 <nav class="nav">
   <div class="wrap">
-    <a href="#" class="brand">
-      <img class="mark" src="logo-mark-sage.png" alt="Stanfill Elite Clean Pros logo">
-      Stanfill Elite Clean Pros
+    <a href="#" class="brand" aria-label="Stanfill Elite Clean Pros, back to top">
+      <img class="mark" src="logo-mark-sage.png" alt="">
+      <span class="brand-name">Stanfill <span class="brand-rest">Elite Clean Pros</span></span>
     </a>
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
       <a href="#services">Services</a>
       <a href="#gallery">Our Work</a>
-      <a href="#included">What's Included</a>
       <a href="#promo">Rewards</a>
-      <a href="#why">Why Us</a>
       <a href="#area">Service Area</a>
       <a href="#contact">Contact</a>
+      <div class="nav-menu-extra">
+        <a href="tel:+17316022456" class="menu-call">Call (731) 602-2456</a>
+        <button type="button" class="menu-auth" id="menuAuthBtn" onclick="closeNavMenu(); currentUser ? openAccountPanel() : openAuthModal('nav')">Sign in</button>
+        <a href="#contact" class="menu-book">Book a cleaning</a>
+      </div>
     </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
     <div class="nav-right">
-      <a href="tel:+17316022456" class="nav-phone">(731) 602-2456</a>
-      <button class="auth-btn" id="authOpenBtn" onclick="openAuthModal('nav')">Sign In</button>
-      <div class="account-chip" id="accountChip" onclick="openAccountPanel()" style="display:none;">
+      <a href="tel:+17316022456" class="nav-phone" aria-label="Call (731) 602-2456">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
+        <span class="nav-phone-num">(731) 602-2456</span>
+      </a>
+      <button class="auth-btn" id="authOpenBtn" onclick="openAuthModal('nav')">Sign in</button>
+      <div class="account-chip" id="accountChip" onclick="openAccountPanel()" style="display:none;" role="button" tabindex="0">
         <span id="chipName">Account</span>
       </div>
+      <a href="#contact" class="nav-book">Book a cleaning</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </div>
 </nav>
@@ -666,6 +673,7 @@ auth.onAuthStateChanged(async function(user){
 
     authBtn.style.display = 'none';
     chip.style.display = 'flex';
+    const mab = document.getElementById('menuAuthBtn'); if (mab) mab.textContent = 'My account';
     document.getElementById('chipName').textContent = currentUser.name.split(' ')[0];
 
     // Fill the booking form with THIS account's details. Replace anything left over from a
@@ -686,8 +694,9 @@ auth.onAuthStateChanged(async function(user){
     stopDash(); closeDash();
     currentUser = null;
     clearBookingForm();     // never leave one customer's details in the form for the next person
-    authBtn.style.display = 'inline-block';
+    authBtn.style.display = '';
     chip.style.display = 'none';
+    const mab = document.getElementById('menuAuthBtn'); if (mab) mab.textContent = 'Sign in';
     if (loginGateNote) loginGateNote.style.display = 'block';
   }
 });
@@ -1023,6 +1032,10 @@ function alertBox(title, text){
   const reset = () => { document.getElementById('chgTitle').textContent = 'Change your date'; box.querySelector('input').style.display = '';
     box.querySelectorAll('.msg,.sub,#chgSave').forEach(n => n.style.display = ''); box.querySelector('.row button').textContent = 'Never mind'; };
   box.querySelector('.row button').addEventListener('click', reset, { once: true });
+}
+function closeNavMenu(){
+  const l = document.getElementById('navLinks'), t = document.getElementById('navToggle');
+  if (l) l.classList.remove('open'); if (t){ t.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
 }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function dayOf(iso){ const d = new Date(iso); return isNaN(d) ? null : d; }
