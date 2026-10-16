@@ -670,6 +670,12 @@ let currentUser = null; // { uid, name, email, phone }
 
 /* ---------------- Auth state ---------------- */
 
+let formPrefill = { uid: null, name: '', phone: '' };
+function clearBookingForm(){
+  ['name','phone','details'].forEach(function(id){ const f = document.getElementById(id); if (f) f.value = ''; });
+  formPrefill = { uid: null, name: '', phone: '' };
+}
+
 auth.onAuthStateChanged(async function(user){
   const authBtn = document.getElementById('authOpenBtn');
   const chip = document.getElementById('accountChip');
@@ -689,10 +695,13 @@ auth.onAuthStateChanged(async function(user){
     chip.style.display = 'flex';
     document.getElementById('chipName').textContent = currentUser.name.split(' ')[0];
 
+    // Fill the booking form with THIS account's details. Replace anything left over from a
+    // different account (a shared phone or computer), but keep what this person typed themselves.
     const nameField = document.getElementById('name');
     const phoneField = document.getElementById('phone');
-    if (nameField && !nameField.value) nameField.value = currentUser.name;
-    if (phoneField && !phoneField.value) phoneField.value = currentUser.phone || currentUser.email;
+    if (nameField && (!nameField.value || nameField.value === formPrefill.name)) nameField.value = currentUser.name;
+    if (phoneField && (!phoneField.value || phoneField.value === formPrefill.phone)) phoneField.value = currentUser.phone || currentUser.email;
+    formPrefill = { uid: user.uid, name: nameField ? nameField.value : '', phone: phoneField ? phoneField.value : '' };
 
     if (loginGateNote) loginGateNote.style.display = 'none';
     if (submitBtn) submitBtn.disabled = false;
@@ -702,6 +711,7 @@ auth.onAuthStateChanged(async function(user){
   } else {
     stopDash(); closeDash();
     currentUser = null;
+    clearBookingForm();     // never leave one customer's details in the form for the next person
     authBtn.style.display = 'inline-block';
     chip.style.display = 'none';
     if (loginGateNote) loginGateNote.style.display = 'block';
