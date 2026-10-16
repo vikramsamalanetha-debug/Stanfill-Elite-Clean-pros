@@ -835,26 +835,50 @@ function usHolidays(y){
     ['july4','Independence Day',new Date(y,6,4)],['labor','Labor Day',nth(8,1,1)],['thanksgiving','Thanksgiving',nth(10,4,4)],
     ['xmaseve','Christmas Eve',new Date(y,11,24)],['xmas','Christmas Day',new Date(y,11,25)]].map(([id,name,date])=>({id,name,date}));
 }
-let bookingCal = { closedWeekdays: [], holidays: usHolidays(2026).map(h => h.id), closedDates: [] };
+let bookingCal = { closedWeekdays: [], holidays: usHolidays(2026).map(h => h.id), closedDates: [], closedRanges: [], fullDates: [], minNoticeDays: 1, maxWeeksAhead: 12 };
 const ymdLocal = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-function closedReason(date){
-  if (bookingCal.closedWeekdays.includes(date.getDay())) return 'Closed ' + DOW_NAMES[date.getDay()];
-  const key = ymdLocal(date);
-  const h = usHolidays(date.getFullYear()).find(x => bookingCal.holidays.includes(x.id) && ymdLocal(x.date) === key);
-  if (h) return 'Closed for ' + h.name;
-  if (bookingCal.closedDates.includes(key)) return 'Closed';
-  return '';
+function bookingWindow(){
+  const t = new Date(); t.setHours(0,0,0,0);
+  const first = new Date(t); first.setDate(first.getDate() + (bookingCal.minNoticeDays == null ? 1 : bookingCal.minNoticeDays));
+  const last = new Date(t); last.setDate(last.getDate() + (bookingCal.maxWeeksAhead || 12) * 7);
+  return { first, last };
 }
+// Why a day can't be picked ('' = open). kind: soon | far | closed | full
+function dayStatus(date){
+  const w = bookingWindow(), key = ymdLocal(date);
+  if (date < w.first) return { kind: 'soon', why: 'Too soon to book online. Please call (731) 602-2456' };
+  if (date > w.last) return { kind: 'far', why: 'Not open for booking yet' };
+  if (bookingCal.closedWeekdays.includes(date.getDay())) return { kind: 'closed', why: 'Closed ' + DOW_NAMES[date.getDay()] };
+  const h = usHolidays(date.getFullYear()).find(x => bookingCal.holidays.includes(x.id) && ymdLocal(x.date) === key);
+  if (h) return { kind: 'closed', why: 'Closed for ' + h.name };
+  const r = bookingCal.closedRanges.find(x => x.from <= key && key <= x.to);
+  if (r) return { kind: 'closed', why: 'Closed (' + (r.label || 'days off') + ')' };
+  if (bookingCal.closedDates.includes(key)) return { kind: 'closed', why: 'Closed' };
+  if (bookingCal.fullDates.includes(key)) return { kind: 'full', why: 'Fully booked' };
+  return { kind: '', why: '' };
+}
+function closedReason(date){ return dayStatus(date).why; }
 function isBookedOut(date){ return !!closedReason(date); }
+// Next day a customer can pick, for "Next open day" hints.
+function nextOpenDay(from){
+  const d = new Date(Math.max(from || 0, bookingWindow().first)); d.setHours(0,0,0,0);
+  for (let i = 0; i < 400; i++){ if (!dayStatus(d).kind) return d; d.setDate(d.getDate() + 1); }
+  return null;
+}
 function loadBookingCalendar(){
   try {
     db.collection('publicCalendars').doc(BUSINESS_ID).get().then(doc => {
       if (!doc.exists) return;
       const c = doc.data() || {};
+      const arr = (v, d) => Array.isArray(v) ? v : d;
       bookingCal = {
-        closedWeekdays: Array.isArray(c.closedWeekdays) ? c.closedWeekdays : [],
-        holidays: Array.isArray(c.holidays) ? c.holidays : bookingCal.holidays,
-        closedDates: Array.isArray(c.closedDates) ? c.closedDates : []
+        closedWeekdays: arr(c.closedWeekdays, []),
+        holidays: arr(c.holidays, bookingCal.holidays),
+        closedDates: arr(c.closedDates, []),
+        closedRanges: arr(c.closedRanges, []),
+        fullDates: arr(c.fullDates, []),
+        minNoticeDays: c.minNoticeDays == null ? 1 : Number(c.minNoticeDays),
+        maxWeeksAhead: Number(c.maxWeeksAhead) || 12
       };
       if (selectedDate && isBookedOut(selectedDate)) selectedDate = null;
       renderCalendar();
@@ -873,7 +897,7 @@ function renderCalendar(){
     '<span class="month-label">' + monthLabel + '</span>' +
     '<div class="calendar-nav">' +
       '<button onclick="changeMonth(-1)" id="calPrevBtn">&larr;</button>' +
-      '<button onclick="changeMonth(1)">&rarr;</button>' +
+      '<button onclick="changeMonth(1)" id="calNextBtn">&rarr;</button>' +
     '</div></div><div class="calendar-grid">';
 
   ['S','M','T','W','T','F','S'].forEach(d => html += '<div class="dow">' + d + '</div>');
@@ -882,23 +906,33 @@ function renderCalendar(){
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(calYear, calMonth, d);
     const past = date < today;
-    const why = past ? '' : closedReason(date);
-    const disabled = past || !!why;
+    const st = past ? { kind: 'past', why: '' } : dayStatus(date), why = st.why;
+    const disabled = past || !!st.kind;
     const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
     html += '<button type="button" class="calendar-day' +
-      (disabled ? ' disabled' : '') + (isSelected ? ' selected' : '') + '"' +
+      (disabled ? ' disabled' : '') + (st.kind ? ' is-' + st.kind : '') + (isSelected ? ' selected' : '') + '"' +
       (disabled ? ' disabled' : ' onclick="selectDate(' + calYear + ',' + calMonth + ',' + d + ')"') +
       (why ? ' title="' + why.replace(/"/g, '&quot;') + '" aria-label="' + d + ', ' + why.replace(/"/g, '&quot;') + '"' : '') +
       '>' + d + '</button>';
   }
   html += '</div>';
+  const nx = nextOpenDay();
+  html += '<div class="cal-legend"><span><i class="lg open"></i>Open</span><span><i class="lg full"></i>Fully booked</span><span><i class="lg closed"></i>Closed</span></div>' +
+    (nx ? '<p class="cal-next">Next open day: <button type="button" onclick="pickNextOpen()">' + nx.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) + '</button></p>' : '');
   document.getElementById('bookingCalendar').innerHTML = html;
 
   const isCurrentMonth = (calYear === today.getFullYear() && calMonth === today.getMonth());
   const prevBtn = document.getElementById('calPrevBtn');
   if (prevBtn) prevBtn.disabled = isCurrentMonth;
+  const nextBtn = document.getElementById('calNextBtn'), w = bookingWindow();
+  if (nextBtn) nextBtn.disabled = new Date(calYear, calMonth + 1, 1) > w.last;
 }
 
+function pickNextOpen(){
+  const d = nextOpenDay(); if (!d) return;
+  calYear = d.getFullYear(); calMonth = d.getMonth();
+  selectDate(calYear, calMonth, d.getDate());
+}
 function changeMonth(delta){
   calMonth += delta;
   if (calMonth < 0) { calMonth = 11; calYear--; }
@@ -1011,9 +1045,9 @@ let chgId = null;
 function openChange(id){
   const b = dash.bookings.find(x => x.id === id); if (!b || !canChange(b)) return;
   chgId = id;
-  const t = new Date(); t.setDate(t.getDate() + 1);
+  const w = bookingWindow();
   const inp = document.getElementById('chgDate');
-  inp.min = ymdLocal(t); inp.value = '';
+  inp.min = ymdLocal(w.first); inp.max = ymdLocal(w.last); inp.value = '';
   document.getElementById('chgInfo').textContent = (b.service || 'Cleaning') + ', now booked for ' + fmtDay(dayOf(b.requestedDate), true) + '.';
   document.getElementById('chgMsg').textContent = '';
   document.getElementById('chgSave').disabled = false;
