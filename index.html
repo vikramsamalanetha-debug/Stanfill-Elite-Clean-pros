@@ -132,6 +132,7 @@
           <input id="loginPassword" type="password" placeholder="Your password">
         </div>
         <button class="btn btn-primary" style="width:100%; border:none; cursor:pointer;" onclick="handleLogin()">Sign in</button>
+        <p style="text-align:center;margin-top:12px;font-size:.9rem"><a href="#" onclick="handleForgot(); return false;" style="color:var(--sage-deep);font-weight:600">Forgot your password?</a></p>
       </div>
 
       <div class="modal-panel" id="registerPanel">
@@ -721,6 +722,29 @@ function switchAuthTab(tab){
   document.getElementById('registerPanel').classList.toggle('active', tab === 'register');
   document.getElementById('authMsg').className = 'modal-msg';
 }
+// Plain-English sign-in messages instead of Firebase's technical ones.
+function authError(e){
+  const c = (e && e.code) || '';
+  if (c === 'auth/too-many-requests') return 'Too many sign-in tries, so sign-in is paused on this device for a little while. Try again later, or tap “Forgot your password?” below to reset it now.';
+  if (c === 'auth/wrong-password' || c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials' || c === 'auth/user-not-found') return 'That email and password don’t match. Check them, or tap “Forgot your password?” below.';
+  if (c === 'auth/invalid-email') return 'That doesn’t look like an email address.';
+  if (c === 'auth/email-already-in-use') return 'There’s already an account with this email. Use Sign In instead (or reset your password).';
+  if (c === 'auth/weak-password') return 'Choose a password with at least 6 characters.';
+  if (c === 'auth/network-request-failed') return 'No connection. Check your internet and try again.';
+  if (c === 'auth/user-disabled') return 'This account is turned off. Please call (731) 602-2456.';
+  return 'Something went wrong. Please try again, or call (731) 602-2456.';
+}
+async function handleForgot(){
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAuthMsg('Type your email above first, then tap “Forgot your password?” again.', 'error'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showAuthMsg('If there’s an account for ' + email + ', a link to set a new password is on its way. Check your inbox and spam folder.', 'success');
+  } catch (e) {
+    if (e && e.code === 'auth/user-not-found') showAuthMsg('If there’s an account for ' + email + ', a link to set a new password is on its way. Check your inbox and spam folder.', 'success');
+    else showAuthMsg(authError(e), 'error');
+  }
+}
 function showAuthMsg(text, type){
   const el = document.getElementById('authMsg');
   el.textContent = text;
@@ -748,7 +772,7 @@ async function handleRegister(){
     });
     closeModal('authModal');
   } catch (e) {
-    showAuthMsg(e.message, 'error');
+    showAuthMsg(authError(e), 'error');
   }
 }
 
@@ -761,7 +785,7 @@ async function handleLogin(){
     await auth.signInWithEmailAndPassword(email, password);
     closeModal('authModal');
   } catch (e) {
-    showAuthMsg(e.message, 'error');
+    showAuthMsg(authError(e), 'error');
   }
 }
 
