@@ -121,7 +121,7 @@
     </button>
     <div class="nav-right">
       <a href="tel:+17316022456" class="nav-phone">(731) 602-2456</a>
-      <button class="auth-btn" id="authOpenBtn" onclick="openAuthModal()">Sign In</button>
+      <button class="auth-btn" id="authOpenBtn" onclick="openAuthModal('nav')">Sign In</button>
       <div class="account-chip" id="accountChip" onclick="openAccountPanel()" style="display:none;">
         <span id="chipName">Account</span>
       </div>
@@ -708,6 +708,7 @@ auth.onAuthStateChanged(async function(user){
 
     loadMyBookings();
     startDash();
+    if (openAfterSignIn) { openAfterSignIn = false; openAccountPanel(); }
   } else {
     stopDash(); closeDash();
     currentUser = null;
@@ -720,7 +721,9 @@ auth.onAuthStateChanged(async function(user){
 
 /* ---------------- Modal + tabs ---------------- */
 
-function openAuthModal(){
+let authOpenedFrom = '', openAfterSignIn = false;
+function openAuthModal(from){
+  authOpenedFrom = from || '';
   document.getElementById('authView').style.display = 'block';
   document.getElementById('accountView').style.display = 'none';
   document.getElementById('authMsg').className = 'modal-msg';
@@ -754,6 +757,7 @@ async function handleRegister(){
     showAuthMsg('Fill in your name, email, and a password.', 'error'); return;
   }
   try {
+    openAfterSignIn = authOpenedFrom === 'nav';
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     await db.collection('customers').doc(cred.user.uid).set({
       name, email, phone,
@@ -761,7 +765,6 @@ async function handleRegister(){
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     closeModal('authModal');
-    setTimeout(openAccountPanel, 400);
   } catch (e) {
     showAuthMsg(e.message, 'error');
   }
@@ -772,9 +775,9 @@ async function handleLogin(){
   const password = document.getElementById('loginPassword').value;
   if (!email || !password) { showAuthMsg('Enter your email and password.', 'error'); return; }
   try {
+    openAfterSignIn = authOpenedFrom === 'nav';   // from the booking form: go back to the form instead
     await auth.signInWithEmailAndPassword(email, password);
     closeModal('authModal');
-    setTimeout(openAccountPanel, 400);
   } catch (e) {
     showAuthMsg(e.message, 'error');
   }
@@ -815,9 +818,9 @@ async function loadMyBookings(){
 
 /* ---------------- Calendar ---------------- */
 
+// Closed on Sundays. Every other day can be requested; the owner confirms availability.
 function isBookedOut(date){
-  const seed = date.getFullYear() * 372 + date.getMonth() * 31 + date.getDate();
-  return date.getDay() === 0 || (seed % 7 === 3);
+  return date.getDay() === 0;
 }
 
 function renderCalendar(){
