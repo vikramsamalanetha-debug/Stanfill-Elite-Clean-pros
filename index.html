@@ -737,11 +737,17 @@ function authError(e){
 async function handleForgot(){
   const email = document.getElementById('loginEmail').value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAuthMsg('Type your email above first, then tap “Forgot your password?” again.', 'error'); return; }
+  const done = () => showAuthMsg('If there’s an account for ' + email + ', a link to set a new password is on its way. Check your inbox and spam folder.', 'success');
+  // Sent through Dayzift's own mail server under the business's name (more reliable than Firebase's built-in sender).
   try {
-    await auth.sendPasswordResetEmail(email);
-    showAuthMsg('If there’s an account for ' + email + ', a link to set a new password is on its way. Check your inbox and spam folder.', 'success');
+    const r = await fetch('https://us-central1-stanfill-clean-pros.cloudfunctions.net/passwordReset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, businessId: BUSINESS_ID }) });
+    if (r.status === 429) { showAuthMsg('Too many reset requests for this email. Please wait an hour, or call (731) 602-2456.', 'error'); return; }
+    if (r.ok) { done(); return; }
+  } catch (e) { /* fall back to Firebase below */ }
+  try {
+    await auth.sendPasswordResetEmail(email); done();
   } catch (e) {
-    if (e && e.code === 'auth/user-not-found') showAuthMsg('If there’s an account for ' + email + ', a link to set a new password is on its way. Check your inbox and spam folder.', 'success');
+    if (e && e.code === 'auth/user-not-found') done();
     else showAuthMsg(authError(e), 'error');
   }
 }
