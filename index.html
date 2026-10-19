@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -85,8 +85,7 @@
       <a href="#services">Services</a>
       <a href="#gallery">Our Work</a>
       <a href="#promo">Rewards</a>
-      <a href="#area">Service Area</a>
-      <a href="#contact">Contact</a>
+      <a href="#about">About us</a>
       <div class="nav-menu-extra">
         <a href="tel:+17316022456" class="menu-call">Call (731) 602-2456</a>
         <button type="button" class="menu-auth" id="menuAuthBtn" onclick="closeNavMenu(); currentUser ? openAccountPanel() : openAuthModal('nav')">Sign in</button>
@@ -112,7 +111,7 @@
 
 <div class="modal-overlay" id="authModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+    <button class="modal-close" onclick="submitAfterSignIn = false; closeModal('authModal')">&times;</button>
 
     <div id="authView">
       <div class="modal-tabs">
@@ -138,7 +137,7 @@
       <div class="modal-panel" id="registerPanel">
         <div class="field">
           <label for="regName">Name</label>
-          <input id="regName" type="text" placeholder="Your name">
+          <input id="regName" type="text" maxlength="100" placeholder="Your name">
         </div>
         <div class="field">
           <label for="regEmail">Email</label>
@@ -146,7 +145,7 @@
         </div>
         <div class="field">
           <label for="regPhone">Phone</label>
-          <input id="regPhone" type="text" placeholder="Best number to reach you">
+          <input id="regPhone" type="text" maxlength="100" placeholder="Best number to reach you">
         </div>
         <div class="field">
           <label for="regPassword">Password</label>
@@ -173,217 +172,46 @@
       <p class="hero-categories-dark">Regular &middot; Deep &middot; Move-Out &middot; Commercial</p>
       <p class="lede">Stanfill Elite Clean Pros runs honest, thorough cleanings out of Lexington for homes and businesses across Henderson County — done right, every time.</p>
       <div class="hero-ctas">
-        <a href="#contact" class="btn btn-primary">Get a Free Quote</a>
+        <a href="#contact" class="btn btn-primary">Book a cleaning</a>
         <a href="tel:+17316022456" class="btn btn-ghost">Call (731) 602-2456</a>
       </div>
-      <p class="hero-note">Serving Lexington and Henderson County, TN</p>
+      <ul class="hero-trust" aria-label="Why customers choose us">
+        <li>Licensed &amp; insured</li><li>Locally owned</li><li>Same crew each time</li><li>Open 7 days</li>
+      </ul>
     </div>
     <div class="hero-photo-card">
       <img src="https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=1000&q=80" alt="Hands cleaning a sink with a rag">
     </div>
   </div>
 </header>
-<div class="trust">
-  <div class="wrap">
-    <div class="trust-item">
-      <span class="icon-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"/></svg></span>
-      Licensed &amp; insured
-    </div>
-    <div class="trust-item">
-      <span class="icon-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></span>
-      Locally owned in Lexington, TN
-    </div>
-    <div class="trust-item">
-      <span class="icon-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
-      Flexible scheduling, 7 days a week
-    </div>
-    <div class="trust-item">
-      <span class="icon-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span>
-      We stand behind our work
-    </div>
-  </div>
-</div>
-<section class="reveal" id="contact">
-  <div class="wrap">
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h2>Check availability &amp; request your date</h2>
-        <p>Pick an open day on the calendar and send us your details — we'll confirm availability and get back to you within a day.</p>
-        <div class="contact-line">
-          <a href="tel:+17316022456">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            (731) 602-2456
-          </a>
-          <a href="mailto:hello@stanfillelitecleanpros.com">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
-            hello@stanfillelitecleanpros.com
-          </a>
-          <span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            Lexington, TN &amp; Henderson County
-          </span>
-        </div>
-      </div>
-      <form id="bookingForm" onsubmit="return false;">
-        <div class="field">
-          <label for="name">Name</label>
-          <input id="name" type="text" placeholder="Your name" required>
-        </div>
-        <div class="field">
-          <label for="phone">Phone or email</label>
-          <input id="phone" type="text" placeholder="Best way to reach you" required>
-        </div>
-        <div class="field">
-          <label for="service">Service needed</label>
-          <select id="service">
-            <option>Regular cleaning</option>
-            <option>Deep cleaning</option>
-            <option>Move-in / move-out cleaning</option>
-            <option>Commercial cleaning</option>
-            <option>Not sure yet</option>
-          </select>
-        </div>
-        <div class="calendar-field">
-          <label style="display:block; font-size:0.88rem; font-weight:600; margin-bottom:8px;">Pick your date</label>
-          <div class="calendar" id="bookingCalendar"></div>
-          <p class="calendar-note" id="calendarSelectedNote">No date selected yet — pick an open day above.</p>
-        </div>
-        <div class="field">
-          <label for="details">Tell us about the space</label>
-          <textarea id="details" placeholder="Home or business size, rooms, any specifics"></textarea>
-        </div>
-        <div class="field-check">
-          <input type="checkbox" id="join-rewards" checked>
-          <label for="join-rewards">Sign me up for Clean Rewards on this booking</label>
-        </div>
-        <div class="modal-msg" id="bookingMsg"></div>
-        <div class="send-options" id="sendOptions" style="display:none;">
-          <a href="#" id="sendEmailBtn" class="btn btn-primary send-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
-            Email this request
-          </a>
-          <a href="#" id="sendTextBtn" class="btn btn-ghost send-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            Text this request
-          </a>
-        </div>
-        <p class="calendar-note" id="loginGateNote">You'll need to <a href="#" onclick="openAuthModal(); return false;">sign in or create an account</a> to submit a booking request.</p>
-        <button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Send availability request</button>
-      </form>
-    </div>
-  </div>
-</section>
-<section class="reveal promo" id="promo">
-  <div class="wrap">
-    <div class="promo-card">
-      <div class="promo-copy">
-        <p class="eyebrow-plain" style="color:var(--honey-deep);">Book online</p>
-        <h2>Book online and start racking up rewards</h2>
-        <p>Every online booking earns Clean Rewards points — just mention you're a Clean Rewards customer when you book, and we'll keep track. Points turn into discounts, free add-ons, and the occasional whole free clean.</p>
-        <a href="#contact" class="btn btn-primary">Book online &amp; start earning</a>
-      </div>
-      <div class="coupon">
-        <div class="coupon-top">
-          <span class="coupon-label">First-time booking bonus</span>
-          <span class="coupon-amount">10% OFF</span>
-          <span class="coupon-sub">your first online booking</span>
-        </div>
-        <div class="coupon-perf" aria-hidden="true"></div>
-        <div class="coupon-bottom">
-          <span class="coupon-note">Plus 1 Clean Rewards point for every $1 you spend, starting day one</span>
-        </div>
-      </div>
-    </div>
 
-    <div class="rewards-block">
-      <div class="rewards-steps">
-        <div class="rewards-step">
-          <span class="num">1</span>
-          <h3>Book online</h3>
-          <p>Fill out the form below for any service — regular, deep, move-out, or commercial.</p>
-        </div>
-        <div class="rewards-step">
-          <span class="num">2</span>
-          <h3>Earn as you go</h3>
-          <p>Every dollar you spend adds toward your Clean Rewards balance.</p>
-        </div>
-        <div class="rewards-step">
-          <span class="num">3</span>
-          <h3>Cash points in</h3>
-          <p>Just ask at your next booking — we'll apply your discount or add-on.</p>
-        </div>
-      </div>
-
-      <div class="tier-grid">
-        <div class="tier-card">
-          <span class="tier-points">100 pts</span>
-          <h3>$10 off</h3>
-          <p>Applied straight to your next booking.</p>
-        </div>
-        <div class="tier-card">
-          <span class="tier-points">250 pts</span>
-          <h3>Free add-on</h3>
-          <p>Inside the fridge, inside the oven, or interior windows — your pick.</p>
-        </div>
-        <div class="tier-card">
-          <span class="tier-points">500 pts</span>
-          <h3>20% off a full clean</h3>
-          <p>Good toward regular, deep, or move-out service.</p>
-        </div>
-        <div class="tier-card featured">
-          <span class="tier-points">1,000 pts</span>
-          <h3>A free standard clean</h3>
-          <p>On the house — our thanks for sticking with us.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 <section class="reveal" id="services">
   <div class="wrap">
     <div class="section-head">
       <h2>What we clean</h2>
-      <p>Four service lanes, one crew. Pick what fits, or tell us what you're dealing with and we'll build a plan around it.</p>
+      <p>Four kinds of cleaning, one local crew. Tap one to book it.</p>
     </div>
-    <div class="lot-grid">
-      <div class="lot-card">
-        <div class="lot-photo"><img src="https://images.unsplash.com/photo-1582667407868-07060cb5e61f?auto=format&fit=crop&w=900&q=80" alt="A clean, modern kitchen"></div>
-        <div class="lot-label">Service 01</div>
-        <h3>Regular Cleaning</h3>
-        <p>Weekly, biweekly, or monthly visits that keep kitchens, bathrooms, and living spaces looking good — without you lifting a sponge.</p>
-        <div class="lot-tags">Weekly / Biweekly / Monthly</div>
-      </div>
-      <div class="lot-card">
-        <div class="lot-photo"><img src="https://images.unsplash.com/photo-1721522007558-7c608934ca7d?auto=format&fit=crop&w=900&q=80" alt="A spotless, modern bathroom"></div>
-        <div class="lot-label">Service 02</div>
-        <h3>Deep Cleaning</h3>
-        <p>Baseboards, inside appliances, grout, and every corner that gets skipped on a normal pass. A good place to start before regular visits begin.</p>
-        <div class="lot-tags">Appliances / Grout / Baseboards</div>
-      </div>
-      <div class="lot-card">
-        <div class="lot-photo"><img src="https://images.unsplash.com/photo-1663625318264-695d2d04f11a?auto=format&fit=crop&w=900&q=80" alt="An empty room with moving boxes"></div>
-        <div class="lot-label">Service 03</div>
-        <h3>Move-In &amp; Move-Out Cleaning</h3>
-        <p>A top-to-bottom clean for closings, lease turnovers, and new-home move-ins — timed around your dates, not ours.</p>
-        <div class="lot-tags">Closings / Turnovers / New Homes</div>
-      </div>
-      <div class="lot-card">
-        <div class="lot-photo"><img src="https://images.unsplash.com/photo-1714757917746-38ac8881575a?auto=format&fit=crop&w=900&q=80" alt="A clean, modern office desk"></div>
-        <div class="lot-label">Service 04</div>
-        <h3>Commercial Cleaning</h3>
-        <p>After-hours and early-morning cleaning for offices, storefronts, and small businesses around Lexington, on a schedule that won't get in your way.</p>
-        <div class="lot-tags">Offices / Storefronts / Small Business</div>
-      </div>
+    <div class="svc-grid">
+      <button type="button" class="svc-card" onclick="bookService('Regular cleaning')">
+        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1582667407868-07060cb5e61f?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-body"><b>Regular cleaning</b><span>Weekly, biweekly or monthly visits that keep your home looking good.</span><em>Book this &rarr;</em></span>
+      </button>
+      <button type="button" class="svc-card" onclick="bookService('Deep cleaning')">
+        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1721522007558-7c608934ca7d?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-body"><b>Deep cleaning</b><span>Baseboards, inside appliances, grout and every corner a normal pass skips.</span><em>Book this &rarr;</em></span>
+      </button>
+      <button type="button" class="svc-card" onclick="bookService('Move-in / move-out cleaning')">
+        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1663625318264-695d2d04f11a?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-body"><b>Move-in &amp; move-out</b><span>Top to bottom for closings, lease turnovers and new homes, timed to your dates.</span><em>Book this &rarr;</em></span>
+      </button>
+      <button type="button" class="svc-card" onclick="bookService('Commercial cleaning')">
+        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1714757917746-38ac8881575a?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-body"><b>Commercial</b><span>Offices, storefronts and small businesses, after hours or early morning.</span><em>Book this &rarr;</em></span>
+      </button>
     </div>
-  </div>
-</section>
-<section class="reveal" id="included">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>What's in a basic cleaning, room by room</h2>
-      <p>We treat every home and business like it's our own. Here's exactly what's covered on a standard visit.</p>
-    </div>
-    <div class="services-grid">
+    <details class="included">
+      <summary><span><b>What's included in a standard clean</b><small>Kitchen, living room, bedrooms and bathrooms, room by room</small></span></summary>
+      <div class="services-grid">
       <div class="service-card">
         <div class="tag">Kitchen</div>
         <ul class="checklist">
@@ -431,127 +259,125 @@
         </ul>
       </div>
     </div>
-
-    <div class="feature-strip">
-      <div class="feature-item">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h5l1 5-2 2a11 11 0 005 5l2-2 5 1v5a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg></div>
-        <div>
-          <h3>Laundry add-on</h3>
-          <p>Wash, dry, and fold service is available for an extra fee — just ask when you book.</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c4-3 8-7 8-12a8 8 0 10-16 0c0 5 4 9 8 12z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-        <div>
-          <h3>Eco-friendly products, no extra cost</h3>
-          <p>Chemical-free cleaning products at no upcharge — a good fit for allergies, pets, or a chemical-free home.</p>
-        </div>
-      </div>
-    </div>
+      <p class="included-extras"><b>Laundry add-on:</b> wash, dry and fold for an extra fee, just ask when you book. <b>Eco-friendly products</b> at no extra cost, good for allergies and pets.</p>
+    </details>
   </div>
 </section>
+
+<section class="reveal book" id="contact">
+  <div class="wrap">
+    <div class="book-head">
+      <div>
+        <h2>Book a cleaning</h2>
+        <p>Pick a day and time. We'll confirm by email, usually within a day.</p>
+      </div>
+      <a class="book-call" href="tel:+17316022456">Rather talk? <b>(731) 602-2456</b></a>
+    </div>
+    <form id="bookingForm" class="bform" onsubmit="return false;" novalidate>
+      <ol class="bprog" aria-hidden="true"><li class="on">What &amp; when</li><li>Your place</li><li>Your details</li></ol>
+      <div class="bstep cur" data-step="1">
+        <h3 class="bstep-t"><span>1</span>What and when</h3>
+        <div class="chips svc-chips" id="svcChips" role="radiogroup" aria-label="Service"></div>
+        <div class="calendar" id="bookingCalendar"></div>
+        <div class="win-box" id="winBox">
+          <p class="blabel" id="winLabel">Pick a time</p>
+          <div class="chips" id="winChips" role="radiogroup" aria-label="Time of day"></div>
+        </div>
+        <p class="calendar-note" id="calendarSelectedNote">Pick an open day above.</p>
+        <div class="bnav"><button type="button" class="btn btn-primary" onclick="bookStep(2)">Next</button></div>
+      </div>
+      <div class="bside">
+        <div class="bstep" data-step="2">
+          <h3 class="bstep-t"><span>2</span>About your place</h3>
+          <p class="blabel">Size <span class="opt">(helps us plan the crew)</span></p>
+          <div class="chips" id="sizeChips" role="radiogroup" aria-label="Size"></div>
+          <div class="field">
+            <label for="details">Anything we should know? <span class="opt">(optional)</span></label>
+            <textarea id="details" rows="2" maxlength="2000" placeholder="Pets, gate code, rooms to skip, extras like inside the fridge"></textarea>
+          </div>
+          <div class="bnav"><button type="button" class="btn btn-ghost" onclick="bookStep(1)">Back</button><button type="button" class="btn btn-primary" onclick="bookStep(3)">Next</button></div>
+        </div>
+        <div class="bstep" data-step="3">
+          <h3 class="bstep-t"><span>3</span>Your details</h3>
+          <div class="who-box" id="whoBox" hidden>Booking as <b id="whoName"></b><span id="whoContact"></span><button type="button" onclick="editWho()">Change</button></div>
+          <div class="brow" id="whoFields">
+            <div class="field"><label for="name">Name</label><input id="name" type="text" maxlength="100" placeholder="Your name" autocomplete="name"></div>
+            <div class="field"><label for="phone">Phone or email</label><input id="phone" type="text" maxlength="100" placeholder="Best way to reach you" autocomplete="tel"></div>
+          </div>
+          <div class="field-check" id="rewardsRow">
+            <input type="checkbox" id="join-rewards" checked>
+            <label for="join-rewards">Join Clean Rewards (free): 10% off this first online booking and points on every clean</label>
+          </div>
+          <div class="bsummary" id="bSummary"></div>
+          <div class="modal-msg" id="bookingMsg"></div>
+          <div class="send-options" id="sendOptions" style="display:none;">
+            <a href="#" id="sendEmailBtn" class="btn btn-primary send-btn">Email this request</a>
+            <a href="#" id="sendTextBtn" class="btn btn-ghost send-btn">Text this request</a>
+          </div>
+          <p class="calendar-note" id="loginGateNote">You'll <a href="#" onclick="openAuthModal(); return false;">sign in or create a free account</a> when you send, so we can email you the confirmation.</p>
+          <div class="bnav"><button type="button" class="btn btn-ghost bback" onclick="bookStep(2)">Back</button><button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Request this date</button></div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
 <section class="reveal" id="gallery">
   <div class="wrap">
     <div class="section-head">
-      <h2>Seeing is believing</h2>
-      <p>A few real jobs from around Lexington — not stock photos.</p>
+      <h2>Our work, and what customers say</h2>
+      <p>Real jobs from around Lexington, not stock photos.</p>
     </div>
-    <div class="gallery-grid">
+    <div class="work-grid">
       <figure class="gallery-item large">
-        <img src="work-kitchen.jpg" alt="Freshly cleaned kitchen with granite counters and stainless appliances in a Lexington home">
-        <figcaption>A finished kitchen — granite counters and stainless polished to shine</figcaption>
+        <img src="work-kitchen.jpg" alt="Freshly cleaned kitchen with granite counters and stainless appliances in a Lexington home" loading="lazy">
+        <figcaption>A finished kitchen, granite and stainless polished to shine</figcaption>
       </figure>
       <figure class="gallery-item">
-        <img src="work-stove.jpg" alt="Clean stovetop and oven glass after a deep clean">
+        <img src="work-stove.jpg" alt="Clean stovetop and oven glass after a deep clean" loading="lazy">
         <figcaption>Stovetop and oven, spotless inside and out</figcaption>
       </figure>
-    </div>
-  </div>
-</section>
-<section class="reveal process">
-  <div class="wrap">
-    <div class="section-head">
-      <h2>Booking's simple — three steps and you're done</h2>
-      <p>No account to create, no long forms — just tell us what you need and we'll take it from there.</p>
-    </div>
-    <div class="process-list">
-      <div class="process-step">
-        <span class="num">1</span>
-        <h3>Reach out</h3>
-        <p>Call, email, or send the form below with your home or business size and what you need cleaned.</p>
-      </div>
-      <div class="process-step">
-        <span class="num">2</span>
-        <h3>We set a time</h3>
-        <p>You'll hear back within a day with a price and a slot that fits your week — evenings included.</p>
-      </div>
-      <div class="process-step">
-        <span class="num">3</span>
-        <h3>We get to work</h3>
-        <p>Our crew shows up, does right by your home, and locks up behind them when they're done.</p>
+      <div class="quotes">
+        <blockquote>"They've done our house every other week for a year now. I don't think about cleaning anymore. It's just handled."<cite>A Lexington homeowner</cite></blockquote>
+        <blockquote>"We use them for our office off Highway 22. Always after hours, always locked up tight when they leave."<cite>A local small business owner</cite></blockquote>
       </div>
     </div>
   </div>
 </section>
-<section class="reveal" id="why">
+
+<section class="reveal" id="about">
   <div class="wrap">
-    <div class="why-block">
-      <div class="why-copy">
-        <h2>Why Lexington families and businesses keep calling us back</h2>
-        <p>Every visit is handled the same straightforward way, whether it's a weekly reset or a one-time deep clean.</p>
-        <ul class="fact-list">
-          <li>Fully insured and bonded on every visit, no exceptions</li>
-          <li>The same crew each time — never a rotating stranger</li>
-          <li>Locally owned and run out of Lexington, not a franchise call center</li>
-          <li>Serving Lexington and Henderson County, TN</li>
-        </ul>
-      </div>
-      <div class="why-photo">
-        <img src="https://images.unsplash.com/photo-1604882234072-d5741489e0c0?auto=format&fit=crop&w=1000&q=80" alt="A welcoming front porch, Lexington, Tennessee">
-      </div>
-    </div>
-    <div class="quote-block">
-      <blockquote>"They've done our house every other week for a year now. I don't think about cleaning anymore — it's just handled."</blockquote>
-      <cite>— A Lexington homeowner</cite>
-      <div class="quote-divider"></div>
-      <blockquote>"We use them for our office off Highway 22. Always after hours, always locked up tight when they leave."</blockquote>
-      <cite>— A local small business owner</cite>
-    </div>
-  </div>
-</section>
-<section class="reveal" id="team">
-  <div class="wrap">
-    <div class="team-block">
-      <div>
-        <div class="team-photo">
-          <img src="owners.jpg" alt="The husband-and-wife team behind Stanfill Elite Clean Pros">
-        </div>
-        <p class="photo-caption">The Stanfills — Lexington, Tennessee</p>
-      </div>
+    <div class="about-block">
+      <div class="team-photo"><img src="owners.jpg" alt="The husband-and-wife team behind Stanfill Elite Clean Pros" loading="lazy"></div>
       <div class="team-copy">
         <p class="eyebrow-plain">Meet the owners</p>
         <h2>A husband-and-wife team, born and raised right here</h2>
-        <p>Stanfill Elite Clean Pros is run by a local husband-and-wife team who treat every home and business like it's their own. When you book with us, you're not calling a call center — you're talking to the people who'll actually show up and do the work.</p>
+        <p>When you book with us, you're not calling a call center. You're talking to the people who'll actually show up and do the work, and we treat every home and business like it's our own.</p>
+        <p class="blabel" id="area" style="margin-top:22px">Where we clean</p>
+        <div class="town-list">
+          <span class="town-pill">Lexington</span><span class="town-pill">Scotts Hill</span><span class="town-pill">Parsons</span><span class="town-pill">Sardis</span><span class="town-pill">Wildersville</span><span class="town-pill">Darden</span><span class="town-pill">Huron</span>
+        </div>
+        <p class="town-note">Somewhere else nearby? Give us a call, we might still be able to help.</p>
       </div>
     </div>
   </div>
 </section>
-<section class="reveal area" id="area">
+
+<section class="reveal rewards-band" id="promo">
   <div class="wrap">
-    <div>
-      <h2>Based in Lexington. At home across Henderson County.</h2>
-      <p>Stanfill Elite Clean Pros is run out of Lexington, TN and gets around to the towns nearby, too. Don't see your spot on the list? Give us a call — we might still be able to help.</p>
-    </div>
-    <div>
-      <div class="town-list">
-        <span class="town-pill">Lexington</span>
-        <span class="town-pill">Scotts Hill</span>
-        <span class="town-pill">Parsons</span>
-        <span class="town-pill">Sardis</span>
-        <span class="town-pill">Wildersville</span>
-        <span class="town-pill">Darden</span>
-        <span class="town-pill">Huron</span>
+    <div class="rb">
+      <div class="rb-copy">
+        <p class="rb-tag">Clean Rewards</p>
+        <h2>10% off your first online booking</h2>
+        <p>Then earn 1 point for every $1 you spend. It's free to join.</p>
       </div>
+      <ul class="rb-tiers">
+        <li><b>100</b> pts<span>$10 off</span></li>
+        <li><b>250</b> pts<span>Free add-on</span></li>
+        <li><b>500</b> pts<span>20% off a clean</span></li>
+        <li><b>1,000</b> pts<span>Free standard clean</span></li>
+      </ul>
+      <a href="#contact" class="btn btn-primary rb-btn">Book &amp; start earning</a>
     </div>
   </div>
 </section>
@@ -576,9 +402,9 @@
         </div>
         <div class="footer-col">
           <h4>Company</h4>
-          <a href="#why">Why Us</a>
+          <a href="#about">About us</a>
           <a href="#area">Service Area</a>
-          <a href="#contact">Contact</a>
+          <a href="#contact">Book a cleaning</a>
         </div>
         <div class="footer-col">
           <h4>Contact</h4>
@@ -628,6 +454,8 @@
     <h3 id="chgTitle">Change your date</h3>
     <p class="sub" id="chgInfo" style="margin:0"></p>
     <input type="date" id="chgDate" aria-label="New date">
+    <select id="chgWin" aria-label="Time of day" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;margin:0 0 4px;background:#fff">
+      <option value="morning">Morning (8 AM – 12 PM)</option><option value="afternoon">Afternoon (12 – 5 PM)</option><option value="any">Either works</option></select>
     <div class="msg" id="chgMsg"></div>
     <p class="sub" style="margin:6px 0 0;font-size:.85rem">Your current date stays booked until we confirm the new one by email.</p>
     <div class="row"><button class="dash-btn ghost" style="margin:0" onclick="closeChange()">Never mind</button><button class="dash-btn" style="margin:0" id="chgSave" onclick="saveChange()">Request new date</button></div>
@@ -652,9 +480,11 @@ let currentUser = null; // { uid, name, email, phone }
 /* ---------------- Auth state ---------------- */
 
 let formPrefill = { uid: null, name: '', phone: '' };
+let bookingSvc = 'Regular cleaning', bookingWin = '', bookingSize = '', bookingSending = false, submitAfterSignIn = false;
 function clearBookingForm(){
   ['name','phone','details'].forEach(function(id){ const f = document.getElementById(id); if (f) f.value = ''; });
   formPrefill = { uid: null, name: '', phone: '' };
+  bookingSize = ''; renderBookingChips(); showWho(false);
 }
 
 auth.onAuthStateChanged(async function(user){
@@ -687,6 +517,11 @@ auth.onAuthStateChanged(async function(user){
 
     if (loginGateNote) loginGateNote.style.display = 'none';
     if (submitBtn) submitBtn.disabled = false;
+    currentUser.rewardsMember = !!profile.rewardsMember;
+    document.getElementById('rewardsRow').hidden = currentUser.rewardsMember;
+    showWho(!!(nameField && nameField.value && phoneField && phoneField.value));
+    updateSummary();
+    if (submitAfterSignIn) { submitAfterSignIn = false; setTimeout(handleBookingSubmit, 50); }
 
     loadMyBookings();
     startDash();
@@ -699,8 +534,22 @@ auth.onAuthStateChanged(async function(user){
     chip.style.display = 'none';
     const mab = document.getElementById('menuAuthBtn'); if (mab) mab.textContent = 'Sign in';
     if (loginGateNote) loginGateNote.style.display = 'block';
+    document.getElementById('rewardsRow').hidden = false;
   }
 });
+
+// Signed in: show "Booking as Lex · phone" instead of the two boxes (tap Change to edit them).
+function showWho(on){
+  const box = document.getElementById('whoBox'), f = document.getElementById('whoFields');
+  if (!box || !f) return;
+  box.hidden = !on; f.hidden = !!on;
+  if (on) {
+    document.getElementById('whoName').textContent = document.getElementById('name').value;
+    const c = document.getElementById('phone').value, dg = c.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+    document.getElementById('whoContact').textContent = ' · ' + (!/@/.test(c) && dg.length === 10 ? '(' + dg.slice(0,3) + ') ' + dg.slice(3,6) + '-' + dg.slice(6) : c);
+  }
+}
+function editWho(){ showWho(false); document.getElementById('name').focus(); }
 
 /* ---------------- Modal + tabs ---------------- */
 
@@ -819,8 +668,8 @@ async function loadMyBookings(){
       const b = doc.data();
       const d = b.requestedDate ? new Date(b.requestedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
       const status = (b.status || 'pending');
-      html += '<div class="my-booking-row"><strong>' + d + '</strong> — ' + (b.service || '') +
-        '<span class="status status-' + status + '">' + status + '</span></div>';
+      html += '<div class="my-booking-row"><strong>' + esc(d) + '</strong> — ' + esc(b.service || '') +
+        '<span class="status status-' + esc(status) + '">' + esc(status) + '</span></div>';
     });
     listEl.innerHTML = html;
   } catch (e) {
@@ -841,7 +690,11 @@ function usHolidays(y){
     ['july4','Independence Day',new Date(y,6,4)],['labor','Labor Day',nth(8,1,1)],['thanksgiving','Thanksgiving',nth(10,4,4)],
     ['xmaseve','Christmas Eve',new Date(y,11,24)],['xmas','Christmas Day',new Date(y,11,25)]].map(([id,name,date])=>({id,name,date}));
 }
-let bookingCal = { closedWeekdays: [], holidays: usHolidays(2026).map(h => h.id), closedDates: [], closedRanges: [], fullDates: [], minNoticeDays: 1, maxWeeksAhead: 12 };
+let bookingCal = { closedWeekdays: [], holidays: usHolidays(2026).map(h => h.id), closedDates: [], closedRanges: [], fullDates: [], fullSlots: [], windows: true, minNoticeDays: 1, maxWeeksAhead: 12 };
+// Time of day customers can ask for. The owner can turn this off in Dayzift (Settings → Booking calendar).
+const WINDOWS = { morning: ['Morning', '8 AM – 12 PM'], afternoon: ['Afternoon', '12 – 5 PM'], any: ['Either', 'Any time'] };
+const winText = w => WINDOWS[w] ? (w === 'any' ? 'any time' : WINDOWS[w][0].toLowerCase() + ' (' + WINDOWS[w][1] + ')') : '';
+const slotFull = (date, w) => bookingCal.fullSlots.includes(ymdLocal(date) + '|' + w);
 const ymdLocal = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 function bookingWindow(){
   const t = new Date(); t.setHours(0,0,0,0);
@@ -860,7 +713,7 @@ function dayStatus(date){
   const r = bookingCal.closedRanges.find(x => x.from <= key && key <= x.to);
   if (r) return { kind: 'closed', why: 'Closed (' + (r.label || 'days off') + ')' };
   if (bookingCal.closedDates.includes(key)) return { kind: 'closed', why: 'Closed' };
-  if (bookingCal.fullDates.includes(key)) return { kind: 'full', why: 'Fully booked' };
+  if (bookingCal.fullDates.includes(key) || (bookingCal.windows && slotFull(date, 'morning') && slotFull(date, 'afternoon'))) return { kind: 'full', why: 'Fully booked' };
   return { kind: '', why: '' };
 }
 function closedReason(date){ return dayStatus(date).why; }
@@ -883,11 +736,13 @@ function loadBookingCalendar(){
         closedDates: arr(c.closedDates, []),
         closedRanges: arr(c.closedRanges, []),
         fullDates: arr(c.fullDates, []),
+        fullSlots: arr(c.fullSlots, []),
+        windows: c.windows !== false,
         minNoticeDays: c.minNoticeDays == null ? 1 : Number(c.minNoticeDays),
         maxWeeksAhead: Number(c.maxWeeksAhead) || 12
       };
       if (selectedDate && isBookedOut(selectedDate)) selectedDate = null;
-      renderCalendar();
+      renderCalendar(); renderBookingChips();
     }).catch(() => {});
   } catch (e) { /* keep the defaults */ }
 }
@@ -948,9 +803,69 @@ function changeMonth(delta){
 
 function selectDate(y, m, d){
   selectedDate = new Date(y, m, d);
-  renderCalendar();
-  const formatted = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  document.getElementById('calendarSelectedNote').innerHTML = 'Next available slot picked: <strong>' + formatted + '</strong>';
+  if (bookingWin && bookingWin !== 'any' && slotFull(selectedDate, bookingWin)) bookingWin = '';
+  renderCalendar(); renderBookingChips();
+}
+
+/* ---------------- Service, time of day, size ---------------- */
+const SERVICES = [['Regular cleaning', 'Regular'], ['Deep cleaning', 'Deep'], ['Move-in / move-out cleaning', 'Move-in/out'], ['Commercial cleaning', 'Commercial'], ['Not sure yet', 'Not sure']];
+const SIZES = ['1–2 bedrooms', '3 bedrooms', '4+ bedrooms', 'Office or business'];
+function chipHtml(group, val, on, label, sub, disabled){
+  return '<button type="button" class="chip' + (sub === 'Full' ? ' full' : '') + '" role="radio" aria-checked="' + on + '"' + (disabled ? ' disabled' : '') +
+    ' onclick="pickChip(\'' + group + '\',\'' + esc(val).replace(/'/g, '&#39;') + '\')">' + esc(label) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</button>';
+}
+function pickChip(group, val){
+  if (group === 'svc') bookingSvc = val;
+  if (group === 'win') bookingWin = val;
+  if (group === 'size') bookingSize = bookingSize === val ? '' : val;
+  if (group === 'svc' && val === 'Commercial cleaning' && !bookingSize) bookingSize = 'Office or business';
+  renderBookingChips();
+}
+function renderBookingChips(){
+  const sv = document.getElementById('svcChips'); if (!sv) return;
+  sv.innerHTML = SERVICES.map(([v, l]) => chipHtml('svc', v, bookingSvc === v, l)).join('');
+  document.getElementById('sizeChips').innerHTML = SIZES.map(v => chipHtml('size', v, bookingSize === v, v)).join('');
+  const box = document.getElementById('winBox');
+  box.hidden = !bookingCal.windows;
+  if (bookingCal.windows) {
+    document.getElementById('winLabel').textContent = selectedDate ? 'Pick a time on ' + selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) : 'Then pick a time';
+    document.getElementById('winChips').innerHTML = Object.keys(WINDOWS).map(w => {
+      const full = selectedDate && w !== 'any' && slotFull(selectedDate, w);
+      return chipHtml('win', w, bookingWin === w, WINDOWS[w][0], full ? 'Full' : WINDOWS[w][1], !selectedDate || full);
+    }).join('');
+  }
+  const note = document.getElementById('calendarSelectedNote');
+  note.className = 'calendar-note';
+  note.innerHTML = selectedDate ? 'You picked <strong>' + selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) +
+    (bookingCal.windows && bookingWin ? ', ' + esc(winText(bookingWin)) : '') + '</strong>' : 'Pick an open day above.';
+  updateSummary();
+}
+function updateSummary(){
+  const el = document.getElementById('bSummary'); if (!el) return;
+  const parts = [bookingSvc, selectedDate ? selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '',
+    bookingCal.windows && bookingWin ? WINDOWS[bookingWin][0] : '', bookingSize].filter(Boolean);
+  el.innerHTML = selectedDate ? 'Your request: <b>' + parts.map(esc).join(' · ') + '</b>' : '';
+}
+// What's missing before a request can go ('' = ready). Used by Next on phones and by Send.
+function stepProblem(n){
+  if (n === 1) {
+    if (!selectedDate) return 'Pick a day on the calendar first.';
+    if (bookingCal.windows && !bookingWin) return 'Pick morning, afternoon or either.';
+  }
+  return '';
+}
+function bookStep(n){
+  const cur = Number((document.querySelector('.bstep.cur') || {}).dataset ? document.querySelector('.bstep.cur').dataset.step : 1);
+  if (n > cur) { const p = stepProblem(1); if (p) { const note = document.getElementById('calendarSelectedNote'); note.textContent = p; note.className = 'calendar-note err'; return; } }
+  document.querySelectorAll('.bstep').forEach(x => x.classList.toggle('cur', Number(x.dataset.step) === n));
+  document.querySelectorAll('.bprog li').forEach((x, i) => x.classList.toggle('on', i < n));
+  updateSummary();
+  const f = document.getElementById('bookingForm');
+  if (f && f.getBoundingClientRect().top < 0) f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function bookService(svc){
+  bookingSvc = svc; renderBookingChips(); bookStep(1);
+  document.getElementById('contact').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ---------------- Booking submit ---------------- */
@@ -958,67 +873,65 @@ function selectDate(y, m, d){
 async function handleBookingSubmit(){
   const msgEl = document.getElementById('bookingMsg');
   const sendOptions = document.getElementById('sendOptions');
+  const bad = t => { msgEl.textContent = t; msgEl.className = 'modal-msg show error'; };
   sendOptions.style.display = 'none';
+  if (bookingSending) return;
+
+  const p1 = stepProblem(1);
+  if (p1) { bookStep(1); const note = document.getElementById('calendarSelectedNote'); note.textContent = p1; note.className = 'calendar-note err'; bad(p1); return; }
 
   if (!currentUser) {
-    msgEl.textContent = 'Please sign in or create an account first, so we can keep you posted on this request.';
-    msgEl.className = 'modal-msg show error';
-    openAuthModal();
+    msgEl.textContent = 'Sign in or create a free account, and your request goes out right after.';
+    msgEl.className = 'modal-msg show success';
+    submitAfterSignIn = true;
+    openAuthModal('book');
     return;
   }
 
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  const service = document.getElementById('service').value;
+  const service = bookingSvc;
   const details = document.getElementById('details').value.trim();
-
-  if (!name || !phone) {
-    msgEl.textContent = 'Add your name and best contact info first.';
-    msgEl.className = 'modal-msg show error';
-    return;
-  }
-  if (!selectedDate) {
-    msgEl.textContent = 'Pick a date on the calendar above so we\'re both on the same page.';
-    msgEl.className = 'modal-msg show error';
-    return;
-  }
+  if (!name || !phone) { showWho(false); bad('Add your name and the best way to reach you.'); return; }
 
   const formatted = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-  const joiningRewards = document.getElementById('join-rewards').checked;
+  const win = bookingCal.windows ? bookingWin : '';
+  const joiningRewards = !currentUser.rewardsMember && document.getElementById('join-rewards').checked;
+  const btn = document.getElementById('bookingSubmitBtn');
+  bookingSending = true; btn.disabled = true; btn.textContent = 'Sending…';
 
   try {
     await db.collection('bookings').add({
       uid: currentUser.uid,
       name, phone, service,
       requestedDate: selectedDate.toISOString(),
+      timeWindow: win,
+      size: bookingSize,
       details: details || '',
       wantsRewards: joiningRewards,
       status: 'pending',
-      businessId: 'stanfill-elite-clean-pros',
+      businessId: BUSINESS_ID,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    const rewardsMsg = joiningRewards ? ' We\'ll get you started on Clean Rewards too.' : '';
-    msgEl.textContent = 'Your ' + formatted + ' request has been sent — we\'ll confirm availability shortly.' + rewardsMsg;
+    const when = formatted + (win ? ', ' + winText(win) : '');
+    msgEl.textContent = 'Sent! Your request for ' + when + ' is in. We’ll email you as soon as it’s confirmed.' + (joiningRewards ? ' We’ll get you started on Clean Rewards too.' : '');
     msgEl.className = 'modal-msg show success';
     loadMyBookings();
+    selectedDate = null; bookingWin = ''; renderCalendar(); renderBookingChips();   // so a second tap can't send it twice
 
-    // Also offer email/text as a backup, in case she's not checking the dashboard yet
-    const subject = 'Availability request — ' + formatted + ' (' + service + ')';
-    const bodyLines = [
-      'Name: ' + name, 'Contact: ' + phone, 'Service: ' + service,
-      'Requested date: ' + formatted, 'Details: ' + (details || '—')
-    ];
+    // Also offer email/text as a backup
+    const subject = 'Availability request — ' + when + ' (' + service + ')';
+    const bodyLines = ['Name: ' + name, 'Contact: ' + phone, 'Service: ' + service, 'Requested: ' + when, 'Size: ' + (bookingSize || '—'), 'Details: ' + (details || '—')];
     const mailto = 'mailto:hello@stanfillelitecleanpros.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyLines.join('\n'));
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const smsBody = subject + '. ' + name + ', ' + phone;
-    const smsHref = 'sms:+17316022456' + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(smsBody);
+    const smsHref = 'sms:+17316022456' + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(subject + '. ' + name + ', ' + phone);
     document.getElementById('sendEmailBtn').setAttribute('href', mailto);
     document.getElementById('sendTextBtn').setAttribute('href', smsHref);
-    sendOptions.style.display = 'flex';
   } catch (e) {
-    msgEl.textContent = 'Something went wrong saving your request: ' + e.message;
-    msgEl.className = 'modal-msg show error';
+    bad('Couldn’t send your request. Check your connection and try again, or call (731) 602-2456.');
+  } finally {
+    bookingSending = false; btn.disabled = false; btn.textContent = 'Request this date';
   }
 }
 
@@ -1054,6 +967,7 @@ function openChange(id){
   const w = bookingWindow();
   const inp = document.getElementById('chgDate');
   inp.min = ymdLocal(w.first); inp.max = ymdLocal(w.last); inp.value = '';
+  const ws = document.getElementById('chgWin'); ws.style.display = bookingCal.windows ? '' : 'none'; ws.value = WINDOWS[b.timeWindow] ? b.timeWindow : 'any';
   document.getElementById('chgInfo').textContent = (b.service || 'Cleaning') + ', now booked for ' + fmtDay(dayOf(b.requestedDate), true) + '.';
   document.getElementById('chgMsg').textContent = '';
   document.getElementById('chgSave').disabled = false;
@@ -1070,10 +984,12 @@ async function saveChange(){
   if (nd < tomorrow) { msg.textContent = 'Pick a day from tomorrow on.'; return; }
   if (nd.toDateString() === dayOf(b.requestedDate).toDateString()) { msg.textContent = 'That’s the day you already have.'; return; }
   const why = closedReason(nd); if (why) { msg.textContent = fmtDay(nd) + ': ' + why.toLowerCase() + '. Please pick another day.'; return; }
+  const nw = bookingCal.windows ? document.getElementById('chgWin').value : '';
+  if (nw && nw !== 'any' && slotFull(nd, nw)) { msg.textContent = 'The ' + WINDOWS[nw][0].toLowerCase() + ' of ' + fmtDay(nd) + ' is full. Try the other time or another day.'; return; }
   if (!canChange(b)) { msg.innerHTML = 'It’s now less than 24 hours away. Please ' + PHONE_LINK + '.'; return; }
   document.getElementById('chgSave').disabled = true;
   try {
-    await db.collection('bookings').doc(b.id).update({ change: { type: 'reschedule', from: b.requestedDate, to: nd.toISOString(), at: Date.now(), status: 'pending' } });
+    await db.collection('bookings').doc(b.id).update({ change: { type: 'reschedule', from: b.requestedDate, to: nd.toISOString(), fromWindow: b.timeWindow || '', window: nw, at: Date.now(), status: 'pending' } });
     closeChange();
     alertBox('Request sent', 'We’ll email you as soon as ' + fmtDay(nd, true) + ' is confirmed. Until then, your original date stays booked.');
   } catch (e) { document.getElementById('chgSave').disabled = false; msg.textContent = 'Couldn’t send it. Please try again or call (731) 602-2456.'; }
@@ -1090,11 +1006,11 @@ function alertBox(title, text){
   document.getElementById('chgTitle').textContent = title;
   document.getElementById('chgInfo').textContent = text;
   const box = document.getElementById('chgBox');
-  box.querySelector('input').style.display = 'none'; box.querySelectorAll('.msg,.sub:not(#chgInfo),#chgSave').forEach(n => n.style.display = 'none');
+  box.querySelector('input').style.display = 'none'; box.querySelectorAll('.msg,.sub:not(#chgInfo),#chgSave,#chgWin').forEach(n => n.style.display = 'none');
   box.querySelector('.row button').textContent = 'OK';
   box.classList.add('open');
   const reset = () => { document.getElementById('chgTitle').textContent = 'Change your date'; box.querySelector('input').style.display = '';
-    box.querySelectorAll('.msg,.sub,#chgSave').forEach(n => n.style.display = ''); box.querySelector('.row button').textContent = 'Never mind'; };
+    box.querySelectorAll('.msg,.sub,#chgSave,#chgWin').forEach(n => n.style.display = ''); box.querySelector('.row button').textContent = 'Never mind'; };
   box.querySelector('.row button').addEventListener('click', reset, { once: true });
 }
 function closeNavMenu(){
@@ -1102,6 +1018,7 @@ function closeNavMenu(){
   if (l) l.classList.remove('open'); if (t){ t.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
 }
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const winOf = b => b && WINDOWS[b.timeWindow] && b.timeWindow !== 'any' ? ' · ' + WINDOWS[b.timeWindow][0] : '';
 function dayOf(iso){ const d = new Date(iso); return isNaN(d) ? null : d; }
 function fmtDay(d, long){ return d ? d.toLocaleDateString('en-US', long ? { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' } : { month: 'short', day: 'numeric', year: 'numeric' }) : '—'; }
 function calLink(b){
@@ -1158,12 +1075,12 @@ function renderDash(){
   const nx = upcoming[0];
   let nextHtml;
   if (nx) {
-    nextHtml = '<h3>Your next clean</h3><div class="big">' + esc(fmtDay(dayOf(nx.requestedDate), true)) + '</div><p>' + esc(nx.service || 'Cleaning') + ' &middot; confirmed ✓</p>' +
+    nextHtml = '<h3>Your next clean</h3><div class="big">' + esc(fmtDay(dayOf(nx.requestedDate), true)) + '</div><p>' + esc((nx.service || 'Cleaning') + winOf(nx)) + ' &middot; confirmed ✓</p>' +
       '<a class="dash-btn" href="' + esc(calLink(nx)) + '" target="_blank" rel="noopener">Add to calendar</a>' + (canChange(nx) ? '<button class="dash-btn ghost" onclick="openChange(\'' + esc(nx.id) + '\')">Change date</button><button class="dash-btn ghost" onclick="cancelBooking(\'' + esc(nx.id) + '\')">Cancel</button>' : '<a class="dash-btn ghost" href="tel:+17316022456">Need to change it? Call us</a>') +
       (changeWaiting(nx) ? '<p style="margin-top:8px">Moving to <b>' + esc(fmtDay(dayOf(nx.change.to), true)) + '</b> · waiting for confirmation</p>' : '');
   } else if (pending.length) {
     const p = pending[pending.length - 1];
-    nextHtml = '<h3>Request sent</h3><div class="big">' + esc(fmtDay(dayOf(p.requestedDate), true)) + '</div><p>' + esc(p.service || 'Cleaning') + ' &middot; waiting for confirmation. You’ll get an email as soon as it’s approved.</p>';
+    nextHtml = '<h3>Request sent</h3><div class="big">' + esc(fmtDay(dayOf(p.requestedDate), true)) + '</div><p>' + esc((p.service || 'Cleaning') + winOf(p)) + ' &middot; waiting for confirmation. You’ll get an email as soon as it’s approved.</p>';
   } else {
     nextHtml = '<h3>Nothing scheduled</h3><div class="big">Ready for a fresh home?</div><p>Pick a day and we’ll take it from there.</p><button class="dash-btn" onclick="bookNow()">Book a cleaning</button>';
   }
@@ -1200,7 +1117,7 @@ function renderDash(){
     const st = b.status || 'pending';
     const d = dayOf(b.requestedDate);
     const extra = st === 'confirmed' && d >= today ? '<a href="' + esc(calLink(b)) + '" target="_blank" rel="noopener">Add to calendar</a>' : '';
-    return '<div class="bk"><div class="bk-main"><b>' + esc(fmtDay(d)) + '</b><span>' + esc(b.service || 'Cleaning') + '</span>' + (changeWaiting(b) || (b.change && b.change.status === 'too_late') || (['pending','confirmed'].includes(st) && d >= today && !canChange(b)) ? bookingActions(b) : '') + '</div>' + extra +
+    return '<div class="bk"><div class="bk-main"><b>' + esc(fmtDay(d)) + '</b><span>' + esc((b.service || 'Cleaning') + winOf(b)) + '</span>' + (changeWaiting(b) || (b.change && b.change.status === 'too_late') || (['pending','confirmed'].includes(st) && d >= today && !canChange(b)) ? bookingActions(b) : '') + '</div>' + extra +
       (canChange(b) ? bookingActions(b) : '') +
       '<button onclick="rebook(\'' + esc(b.id) + '\')">Book again</button><span class="pill ' + esc(st) + '">' + esc(st) + '</span></div>';
   }).join('');
@@ -1243,10 +1160,10 @@ function goBook(){
 function bookNow(){ goBook(); }
 function rebook(id){
   const b = dash.bookings.find(x => x.id === id);
-  if (b && b.service) document.getElementById('service').value = b.service;
+  if (b && b.service) bookingSvc = b.service;
+  if (b && b.size) bookingSize = b.size;
+  renderBookingChips(); bookStep(1);
   goBook();
-  const m = document.getElementById('bookingMsg');
-  m.textContent = 'Pick a new date below, then send your request.'; m.className = 'modal-msg show success';
 }
 
 /* ---------------- Init ---------------- */
@@ -1255,7 +1172,7 @@ function rebook(id){
   const today = new Date();
   calYear = today.getFullYear();
   calMonth = today.getMonth();
-  renderCalendar();
+  renderCalendar(); renderBookingChips();
   loadBookingCalendar();     // then apply the owner's open days and days off
 })();
 </script>
