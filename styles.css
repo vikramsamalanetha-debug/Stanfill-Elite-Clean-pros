@@ -1572,3 +1572,11 @@
 .svc-icon svg{ width:56px; height:56px; fill:none; stroke:var(--sage-deep); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
 @media (max-width: 640px){ .svc-icon svg{ width:40px; height:40px; } }
 .footer-col a[href^="tel:"], .footer-col a[href^="mailto:"]{ word-break:break-word; }
+
+/* Booking without an account */
+.guest-save{ background:#F0FDFA; border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:10px 0; }
+.guest-save p{ margin:0 0 10px; font-size:.9rem; color:var(--ink); }
+.guest-save-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.guest-save-row input{ flex:1 1 200px; min-width:0; padding:11px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; }
+.guest-save-msg{ margin:8px 0 0 !important; font-size:.85rem !important; color:var(--coral) !important; }
+.guest-save-msg:empty{ display:none; }

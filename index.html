@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=8">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -330,6 +330,7 @@
             <div class="field"><label for="name">Name</label><input id="name" type="text" maxlength="100" placeholder="Your name" autocomplete="name"></div>
             <div class="field"><label for="phone">Phone or email</label><input id="phone" type="text" maxlength="100" placeholder="Best way to reach you" autocomplete="tel"></div>
           </div>
+          <div class="field" id="guestEmailRow" hidden><label for="guestEmail">Email <span class="opt">(for your confirmation)</span></label><input id="guestEmail" type="email" maxlength="200" placeholder="you@email.com" autocomplete="email"></div>
           <div class="field-check" id="rewardsRow">
             <input type="checkbox" id="join-rewards" checked>
             <label for="join-rewards">Join Clean Rewards (free): 10% off this first online booking and points on every clean</label>
@@ -340,7 +341,12 @@
             <a href="#" id="sendEmailBtn" class="btn btn-primary send-btn">Email this request</a>
             <a href="#" id="sendTextBtn" class="btn btn-ghost send-btn">Text this request</a>
           </div>
-          <p class="calendar-note" id="loginGateNote">You'll <a href="#" onclick="openAuthModal(); return false;">sign in or create a free account</a> when you send, so we can email you the confirmation.</p>
+          <p class="calendar-note" id="loginGateNote"><b>No account needed.</b> We'll email your confirmation. Want Clean Rewards points and online changes? <a href="#" onclick="openAuthModal('book'); return false;">Sign in or create a free account</a>.</p>
+          <div class="guest-save" id="guestSave" hidden>
+            <p><b>Save your details for next time?</b> Add a password to track this booking, change it online and start earning Clean Rewards points.</p>
+            <div class="guest-save-row"><input id="guestPw" type="password" placeholder="Choose a password (6+ characters)" autocomplete="new-password" aria-label="Choose a password"><button type="button" class="btn btn-primary" id="guestSaveBtn" onclick="saveGuestAccount()">Save</button></div>
+            <p class="guest-save-msg" id="guestSaveMsg"></p>
+          </div>
           <div class="bnav"><button type="button" class="btn btn-ghost bback" onclick="bookStep(2)">Back</button><button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Request this date</button></div>
         </div>
       </div>
@@ -514,7 +520,19 @@ function clearBookingForm(){
   bookingSize = ''; renderBookingChips(); showWho(false);
 }
 
-auth.onAuthStateChanged(async function(user){
+let guestBooked = false;
+const isGuest = u => !!(u && u.isAnonymous);
+// Shows or hides the guest-only email box (people who aren't signed in to a real account).
+function setGuestMode(on){
+  const r = document.getElementById('guestEmailRow'); if (r) r.hidden = !on;
+  const l = document.querySelector('label[for="phone"]'), f = document.getElementById('phone');
+  if (l) l.textContent = on ? 'Phone' : 'Phone or email';
+  if (f) { f.placeholder = on ? 'Best number to reach you' : 'Best way to reach you'; f.type = on ? 'tel' : 'text'; }
+}
+auth.onAuthStateChanged(handleAuthState);
+async function handleAuthState(user){
+  if (isGuest(user)) { setGuestMode(true); document.getElementById('rewardsRow').hidden = true; return; }   // a guest booking: the page stays signed out
+  setGuestMode(!user);
   const authBtn = document.getElementById('authOpenBtn');
   const chip = document.getElementById('accountChip');
   const loginGateNote = document.getElementById('loginGateNote');
@@ -561,9 +579,9 @@ auth.onAuthStateChanged(async function(user){
     chip.style.display = 'none';
     const mab = document.getElementById('menuAuthBtn'); if (mab) mab.textContent = 'Sign in';
     if (loginGateNote) loginGateNote.style.display = 'block';
-    document.getElementById('rewardsRow').hidden = false;
+    document.getElementById('rewardsRow').hidden = true;   // Rewards needs an account; the note above offers it
   }
-});
+}
 
 // Signed in: show "Booking as Lex · phone" instead of the two boxes (tap Change to edit them).
 function showWho(on){
@@ -907,13 +925,7 @@ async function handleBookingSubmit(){
   const p1 = stepProblem(1);
   if (p1) { bookStep(1); const note = document.getElementById('calendarSelectedNote'); note.textContent = p1; note.className = 'calendar-note err'; bad(p1); return; }
 
-  if (!currentUser) {
-    msgEl.textContent = 'Sign in or create a free account, and your request goes out right after.';
-    msgEl.className = 'modal-msg show success';
-    submitAfterSignIn = true;
-    openAuthModal('book');
-    return;
-  }
+  if (!currentUser) return handleGuestSubmit();
 
   const name = document.getElementById('name').value.trim();
   const phone = document.getElementById('phone').value.trim();
@@ -960,6 +972,81 @@ async function handleBookingSubmit(){
   } finally {
     bookingSending = false; btn.disabled = false; btn.textContent = 'Request this date';
   }
+}
+
+/* ---------------- Booking without an account ----------------
+   A guest gets a private, password-free sign-in behind the scenes (Firebase "anonymous" sign-in),
+   so the request is still sent as one person and the same safety rules apply.
+   Confirmation emails go to the email they type. They can add a password afterwards. */
+async function handleGuestSubmit(){
+  const msgEl = document.getElementById('bookingMsg');
+  const bad = t => { msgEl.textContent = t; msgEl.className = 'modal-msg show error'; };
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('guestEmail').value.trim().toLowerCase();
+  if (!name || !phone) { showWho(false); bad('Add your name and the best way to reach you.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { bad('Add your email so we can send your confirmation.'); document.getElementById('guestEmail').focus(); return; }
+  const service = bookingSvc, details = document.getElementById('details').value.trim();
+  const formatted = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  const win = bookingCal.windows ? bookingWin : '';
+  const when = formatted + (win ? ', ' + winText(win) : '');
+  const btn = document.getElementById('bookingSubmitBtn');
+  bookingSending = true; btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    if (!auth.currentUser) await auth.signInAnonymously();
+    await db.collection('bookings').add({
+      uid: auth.currentUser.uid, guest: true,
+      name, phone, email, service,
+      requestedDate: selectedDate.toISOString(),
+      timeWindow: win,
+      size: bookingSize,
+      details: details || '',
+      wantsRewards: false,
+      status: 'pending',
+      businessId: BUSINESS_ID,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    guestBooked = true;
+    msgEl.textContent = 'Sent! Your request for ' + when + ' is in. We’ll email ' + email + ' as soon as it’s confirmed.';
+    msgEl.className = 'modal-msg show success';
+    selectedDate = null; bookingWin = ''; renderCalendar(); renderBookingChips();
+    document.getElementById('guestSave').hidden = false;
+    document.getElementById('loginGateNote').style.display = 'none';
+  } catch (e) {
+    // Guest booking not switched on (or offline): hand them email / text with the request filled in.
+    const subject = 'Availability request — ' + when + ' (' + service + ')';
+    const body = ['Name: ' + name, 'Phone: ' + phone, 'Email: ' + email, 'Service: ' + service, 'Requested: ' + when, 'Size: ' + (bookingSize || '—'), 'Details: ' + (details || '—')].join('\n');
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    document.getElementById('sendEmailBtn').setAttribute('href', 'mailto:hello@stanfillelitecleanpros.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body));
+    document.getElementById('sendTextBtn').setAttribute('href', 'sms:+17316022456' + (isIOS ? '&' : '?') + 'body=' + encodeURIComponent(subject + '. ' + name + ', ' + phone));
+    document.getElementById('sendOptions').style.display = '';
+    bad('We couldn’t send that online just now. Email or text it to us below, or call (731) 602-2456.');
+  } finally {
+    bookingSending = false; btn.disabled = false; btn.textContent = 'Request this date';
+  }
+}
+// After a guest booking: add a password and the booking moves into a real account.
+async function saveGuestAccount(){
+  const pw = document.getElementById('guestPw').value, out = document.getElementById('guestSaveMsg');
+  const email = document.getElementById('guestEmail').value.trim().toLowerCase();
+  const name = document.getElementById('name').value.trim(), phone = document.getElementById('phone').value.trim();
+  if (pw.length < 6) { out.textContent = 'Use at least 6 characters.'; return; }
+  const u = auth.currentUser; if (!isGuest(u)) { out.textContent = 'You’re already signed in.'; return; }
+  const b = document.getElementById('guestSaveBtn'); b.disabled = true; b.textContent = 'Saving…';
+  try {
+    await u.linkWithCredential(firebase.auth.EmailAuthProvider.credential(email, pw));
+    await db.collection('customers').doc(u.uid).set({ name, phone, email, businessId: BUSINESS_ID, createdAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    try { await u.sendEmailVerification(); } catch (e) {}
+    document.getElementById('guestSave').hidden = true;
+    await handleAuthState(auth.currentUser);
+    const msgEl = document.getElementById('bookingMsg');
+    msgEl.textContent = 'Saved! You’re signed in, and your request is under My account.';
+    msgEl.className = 'modal-msg show success';
+  } catch (e) {
+    out.textContent = e && e.code === 'auth/email-already-in-use'
+      ? 'That email already has an account. Sign in with it instead, and your next booking will be saved there.'
+      : 'Couldn’t save that. Check the email above and try again.';
+  } finally { b.disabled = false; b.textContent = 'Save'; }
 }
 
 /* ---------------- Customer dashboard ---------------- */
