@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://stanfillelitecleanpros.com/sitemap.xml

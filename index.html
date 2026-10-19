@@ -6,10 +6,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stanfill Elite Clean Pros | House Cleaning in Lexington, TN</title>
 <meta name="description" content="Locally owned house and commercial cleaning in Lexington, TN. Regular, deep, move-in/move-out, and commercial cleaning with eco-friendly products.">
+<link rel="canonical" href="https://stanfillelitecleanpros.com/">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0D9488">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Stanfill Elite Clean Pros">
+<meta property="og:title" content="Stanfill Elite Clean Pros · House cleaning in Lexington, TN">
+<meta property="og:description" content="Locally owned, licensed and insured. Regular, deep, move-in/move-out and commercial cleaning across Henderson County. Book online or call (731) 602-2456.">
+<meta property="og:image" content="https://stanfillelitecleanpros.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A kitchen cleaned by Stanfill Elite Clean Pros in Lexington, Tennessee">
+<meta property="og:url" content="https://stanfillelitecleanpros.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://stanfillelitecleanpros.com/og-image.jpg">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"LocalBusiness","@id":"https://stanfillelitecleanpros.com/#business",
+ "name":"Stanfill Elite Clean Pros","description":"Locally owned house and commercial cleaning in Lexington, Tennessee: regular, deep, move-in/move-out and commercial cleaning.",
+ "url":"https://stanfillelitecleanpros.com/","telephone":"+1-731-602-2456","email":"hello@stanfillelitecleanpros.com",
+ "image":["https://stanfillelitecleanpros.com/work-kitchen.jpg","https://stanfillelitecleanpros.com/owners.jpg"],
+ "logo":"https://stanfillelitecleanpros.com/apple-touch-icon.png",
+ "address":{"@type":"PostalAddress","addressLocality":"Lexington","addressRegion":"TN","addressCountry":"US"},
+ "areaServed":["Lexington, TN","Scotts Hill, TN","Parsons, TN","Sardis, TN","Wildersville, TN","Darden, TN","Huron, TN","Henderson County, TN"],
+ "makesOffer":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Regular house cleaning"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Deep cleaning"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Move-in and move-out cleaning"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Commercial cleaning"}}]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -152,6 +177,7 @@
           <input id="regPassword" type="password" placeholder="Choose a password (6+ characters)">
         </div>
         <button class="btn btn-primary" style="width:100%; border:none; cursor:pointer;" onclick="handleRegister()">Create account</button>
+        <p style="font-size:.8rem;color:var(--ink-soft);margin:10px 0 0;text-align:center">By creating an account you agree to our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
       </div>
     </div>
 
@@ -180,7 +206,8 @@
       </ul>
     </div>
     <div class="hero-photo-card">
-      <img src="https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=1000&q=80" alt="Hands cleaning a sink with a rag">
+      <img src="work-kitchen.jpg" alt="A kitchen we cleaned in Lexington: granite counters and stainless appliances polished to shine" fetchpriority="high">
+      <span class="hero-photo-tag">A real Stanfill clean &middot; Lexington, TN</span>
     </div>
   </div>
 </header>
@@ -193,19 +220,19 @@
     </div>
     <div class="svc-grid">
       <button type="button" class="svc-card" onclick="bookService('Regular cleaning')">
-        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1582667407868-07060cb5e61f?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-photo svc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9.5 20v-5.5h5V20"/></svg></span>
         <span class="svc-body"><b>Regular cleaning</b><span>Weekly, biweekly or monthly visits that keep your home looking good.</span><em>Book this &rarr;</em></span>
       </button>
       <button type="button" class="svc-card" onclick="bookService('Deep cleaning')">
-        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1721522007558-7c608934ca7d?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-photo svc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M18.5 15l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/><path d="M5 16l.6 1.4L7 18l-1.4.6L5 20l-.6-1.4L3 18l1.4-.6z"/></svg></span>
         <span class="svc-body"><b>Deep cleaning</b><span>Baseboards, inside appliances, grout and every corner a normal pass skips.</span><em>Book this &rarr;</em></span>
       </button>
       <button type="button" class="svc-card" onclick="bookService('Move-in / move-out cleaning')">
-        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1663625318264-695d2d04f11a?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-photo svc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4"/><path d="M12 12v9"/><path d="M7.5 6l9 4"/></svg></span>
         <span class="svc-body"><b>Move-in &amp; move-out</b><span>Top to bottom for closings, lease turnovers and new homes, timed to your dates.</span><em>Book this &rarr;</em></span>
       </button>
       <button type="button" class="svc-card" onclick="bookService('Commercial cleaning')">
-        <span class="svc-photo"><img src="https://images.unsplash.com/photo-1714757917746-38ac8881575a?auto=format&fit=crop&w=700&q=75" alt="" loading="lazy"></span>
+        <span class="svc-photo svc-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 21V5l8-2v18"/><path d="M12 9h8v12"/><path d="M2 21h20"/><path d="M7 8h2M7 12h2M7 16h2M15 13h2M15 17h2"/></svg></span>
         <span class="svc-body"><b>Commercial</b><span>Offices, storefronts and small businesses, after hours or early morning.</span><em>Book this &rarr;</em></span>
       </button>
     </div>
@@ -405,11 +432,12 @@
           <a href="#about">About us</a>
           <a href="#area">Service Area</a>
           <a href="#contact">Book a cleaning</a>
+          <a href="privacy.html">Privacy policy</a>
         </div>
         <div class="footer-col">
           <h4>Contact</h4>
-          <span>(731) 602-2456</span>
-          <span>hello@stanfillelitecleanpros.com</span>
+          <a href="tel:+17316022456">(731) 602-2456</a>
+          <a href="mailto:hello@stanfillelitecleanpros.com">hello@stanfillelitecleanpros.com</a>
         </div>
       </div>
     </div>

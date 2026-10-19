@@ -1564,3 +1564,11 @@
   .chip.full{ text-decoration:line-through; }
   .win-box .chip{ min-width:0; }
   .chip{ padding:8px 12px; }
+
+/* Real photo badge on the hero, and icon tiles for services (no stock photos) */
+.hero-photo-card{ position:relative; }
+.hero-photo-tag{ position:absolute; left:14px; bottom:14px; background:rgba(255,255,255,.94); color:var(--ink); font-size:.8rem; font-weight:600; padding:7px 12px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.12); }
+.svc-icon{ display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,var(--sage-pale),#F0FDFA); }
+.svc-icon svg{ width:56px; height:56px; fill:none; stroke:var(--sage-deep); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+@media (max-width: 640px){ .svc-icon svg{ width:40px; height:40px; } }
+.footer-col a[href^="tel:"], .footer-col a[href^="mailto:"]{ word-break:break-word; }
