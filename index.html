@@ -137,7 +137,7 @@
       <div class="modal-panel" id="registerPanel">
         <div class="field">
           <label for="regName">Name</label>
-          <input id="regName" type="text" placeholder="Your name">
+          <input id="regName" type="text" maxlength="100" placeholder="Your name">
         </div>
         <div class="field">
           <label for="regEmail">Email</label>
@@ -145,7 +145,7 @@
         </div>
         <div class="field">
           <label for="regPhone">Phone</label>
-          <input id="regPhone" type="text" placeholder="Best number to reach you">
+          <input id="regPhone" type="text" maxlength="100" placeholder="Best number to reach you">
         </div>
         <div class="field">
           <label for="regPassword">Password</label>
@@ -293,7 +293,7 @@
           <div class="chips" id="sizeChips" role="radiogroup" aria-label="Size"></div>
           <div class="field">
             <label for="details">Anything we should know? <span class="opt">(optional)</span></label>
-            <textarea id="details" rows="2" placeholder="Pets, gate code, rooms to skip, extras like inside the fridge"></textarea>
+            <textarea id="details" rows="2" maxlength="2000" placeholder="Pets, gate code, rooms to skip, extras like inside the fridge"></textarea>
           </div>
           <div class="bnav"><button type="button" class="btn btn-ghost" onclick="bookStep(1)">Back</button><button type="button" class="btn btn-primary" onclick="bookStep(3)">Next</button></div>
         </div>
@@ -301,8 +301,8 @@
           <h3 class="bstep-t"><span>3</span>Your details</h3>
           <div class="who-box" id="whoBox" hidden>Booking as <b id="whoName"></b><span id="whoContact"></span><button type="button" onclick="editWho()">Change</button></div>
           <div class="brow" id="whoFields">
-            <div class="field"><label for="name">Name</label><input id="name" type="text" placeholder="Your name" autocomplete="name"></div>
-            <div class="field"><label for="phone">Phone or email</label><input id="phone" type="text" placeholder="Best way to reach you" autocomplete="tel"></div>
+            <div class="field"><label for="name">Name</label><input id="name" type="text" maxlength="100" placeholder="Your name" autocomplete="name"></div>
+            <div class="field"><label for="phone">Phone or email</label><input id="phone" type="text" maxlength="100" placeholder="Best way to reach you" autocomplete="tel"></div>
           </div>
           <div class="field-check" id="rewardsRow">
             <input type="checkbox" id="join-rewards" checked>
@@ -662,8 +662,8 @@ async function loadMyBookings(){
       const b = doc.data();
       const d = b.requestedDate ? new Date(b.requestedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
       const status = (b.status || 'pending');
-      html += '<div class="my-booking-row"><strong>' + d + '</strong> — ' + (b.service || '') +
-        '<span class="status status-' + status + '">' + status + '</span></div>';
+      html += '<div class="my-booking-row"><strong>' + esc(d) + '</strong> — ' + esc(b.service || '') +
+        '<span class="status status-' + esc(status) + '">' + esc(status) + '</span></div>';
     });
     listEl.innerHTML = html;
   } catch (e) {
