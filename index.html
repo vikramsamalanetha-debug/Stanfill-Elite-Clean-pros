@@ -34,11 +34,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=8">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
+<link rel="stylesheet" href="styles.css?v=9">
+<link rel="preconnect" href="https://images.unsplash.com">
+<link rel="preconnect" href="https://www.gstatic.com">
+<script>
+// Don't let another website show this one inside a frame (protects the sign-in form from clickjacking).
+if (window.top !== window.self) { document.documentElement.style.display = 'none'; try { window.top.location.replace(window.location.href); } catch (e) {} }
+</script>
 <style>
 /* ===== Customer dashboard ===== */
 .dash{position:fixed;inset:0;z-index:1000;background:var(--cream);overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
@@ -103,7 +105,7 @@
 <nav class="nav">
   <div class="wrap">
     <a href="#" class="brand" aria-label="Stanfill Elite Clean Pros, back to top">
-      <img class="mark" src="logo-mark-sage.png" alt="">
+      <img class="mark" src="logo-mark-sage-sm.png" alt="" width="34" height="34">
       <span class="brand-name">Stanfill <span class="brand-rest">Elite Clean Pros</span></span>
     </a>
     <div class="nav-links" id="navLinks">
@@ -206,7 +208,7 @@
       </ul>
     </div>
     <div class="hero-photo-card">
-      <img src="https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=1000&q=80" alt="Hands cleaning a sink with a rag" fetchpriority="high">
+      <img src="https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=900&q=75" srcset="https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=520&q=72 520w, https://images.unsplash.com/photo-1736433622548-4adbbc1c2cf2?auto=format&fit=crop&w=900&q=75 900w" sizes="(max-width: 860px) 92vw, 460px" width="900" height="1125" alt="Hands cleaning a sink with a rag" fetchpriority="high">
     </div>
   </div>
 </header>
@@ -362,11 +364,11 @@
     </div>
     <div class="work-grid">
       <figure class="gallery-item large">
-        <img src="work-kitchen.jpg" alt="Freshly cleaned kitchen with granite counters and stainless appliances in a Lexington home" loading="lazy">
+        <picture><source srcset="work-kitchen.webp" type="image/webp"><img src="work-kitchen.jpg" alt="Freshly cleaned kitchen with granite counters and stainless appliances in a Lexington home" loading="lazy" width="1200" height="900"></picture>
         <figcaption>A finished kitchen, granite and stainless polished to shine</figcaption>
       </figure>
       <figure class="gallery-item">
-        <img src="work-stove.jpg" alt="Clean stovetop and oven glass after a deep clean" loading="lazy">
+        <picture><source srcset="work-stove.webp" type="image/webp"><img src="work-stove.jpg" alt="Clean stovetop and oven glass after a deep clean" loading="lazy" width="900" height="1200"></picture>
         <figcaption>Stovetop and oven, spotless inside and out</figcaption>
       </figure>
       <div class="quotes">
@@ -380,7 +382,7 @@
 <section class="reveal" id="about">
   <div class="wrap">
     <div class="about-block">
-      <div class="team-photo"><img src="owners.jpg" alt="The husband-and-wife team behind Stanfill Elite Clean Pros" loading="lazy"></div>
+      <div class="team-photo"><picture><source srcset="owners.webp" type="image/webp"><img src="owners.jpg" alt="The husband-and-wife team behind Stanfill Elite Clean Pros" loading="lazy" width="900" height="907"></picture></div>
       <div class="team-copy">
         <p class="eyebrow-plain">Meet the owners</p>
         <h2>A husband-and-wife team, born and raised right here</h2>
@@ -419,7 +421,7 @@
     <div class="footer-top">
       <div>
         <div class="footer-brand">
-          <img class="mark" src="logo-mark-white.png" alt="Stanfill Elite Clean Pros logo">
+          <img class="mark" src="logo-mark-white-sm.png" alt="Stanfill Elite Clean Pros logo" width="26" height="26">
           Stanfill Elite Clean Pros
         </div>
         <p class="footer-tagline">Locally owned house and commercial cleaning, run out of Lexington, TN.</p>
@@ -496,6 +498,10 @@
 </div>
 
 <script src="main.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <script>
 /* =========================================================
    Stanfill Elite Clean Pros — accounts + booking calendar
