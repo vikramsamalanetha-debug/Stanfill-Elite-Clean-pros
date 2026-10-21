@@ -1580,3 +1580,7 @@
 .guest-save-row input{ flex:1 1 200px; min-width:0; padding:11px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; }
 .guest-save-msg{ margin:8px 0 0 !important; font-size:.85rem !important; color:var(--coral) !important; }
 .guest-save-msg:empty{ display:none; }
+
+/* Photos carry their real size (so the page doesn't jump while loading); CSS still decides the shape. */
+.hero-photo-card img, .team-photo img{ height:auto; }
+.gallery-item picture, .team-photo picture{ display:contents; }
