@@ -1584,3 +1584,18 @@
 /* Photos carry their real size (so the page doesn't jump while loading); CSS still decides the shape. */
 .hero-photo-card img, .team-photo img{ height:auto; }
 .gallery-item picture, .team-photo picture{ display:contents; }
+
+/* Booking popups */
+.pop-wrap{ position:fixed; inset:0; z-index:3000; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(31,41,55,.28); opacity:0; pointer-events:none; transition:opacity .18s; }
+.pop-wrap.open{ opacity:1; pointer-events:auto; }
+.pop-wrap.step{ background:transparent; pointer-events:none; }
+.pop-wrap.step.open .pop-card{ pointer-events:auto; }
+.pop-card{ background:#fff; border-radius:18px; box-shadow:0 20px 50px rgba(15,23,42,.22); padding:22px 22px 18px; width:min(360px,100%); text-align:center; transform:translateY(8px) scale(.98); transition:transform .18s; }
+.pop-wrap.open .pop-card{ transform:none; }
+.pop-icon{ display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; font-weight:800; font-size:1.2rem; margin-bottom:8px; background:var(--sage-pale); color:var(--sage-deep); }
+.pop-wrap.ok .pop-icon{ background:var(--sage-deep); color:#fff; }
+.pop-wrap.error .pop-icon{ background:#FDE8E8; color:#C2410C; }
+.pop-title{ display:block; font-family:'Fraunces',Georgia,serif; font-size:1.15rem; color:var(--ink); }
+.pop-text{ margin:6px 0 0; font-size:.95rem; color:var(--ink-soft); line-height:1.45; }
+.pop-ok{ margin-top:14px; width:100%; border:none; cursor:pointer; }
+.pop-wrap.step .pop-ok{ display:none; }

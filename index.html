@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="preconnect" href="https://www.gstatic.com">
 <script>
@@ -312,7 +312,7 @@ if (window.top !== window.self) { document.documentElement.style.display = 'none
           <div class="chips" id="winChips" role="radiogroup" aria-label="Time of day"></div>
         </div>
         <p class="calendar-note" id="calendarSelectedNote">Pick an open day above.</p>
-        <div class="bnav"><button type="button" class="btn btn-primary" onclick="bookStep(2)">Next</button></div>
+        <div class="bnav"><button type="button" class="btn btn-primary" onclick="goStep(2)">Next</button></div>
       </div>
       <div class="bside">
         <div class="bstep" data-step="2">
@@ -323,7 +323,7 @@ if (window.top !== window.self) { document.documentElement.style.display = 'none
             <label for="details">Anything we should know? <span class="opt">(optional)</span></label>
             <textarea id="details" rows="2" maxlength="2000" placeholder="Pets, gate code, rooms to skip, extras like inside the fridge"></textarea>
           </div>
-          <div class="bnav"><button type="button" class="btn btn-ghost" onclick="bookStep(1)">Back</button><button type="button" class="btn btn-primary" onclick="bookStep(3)">Next</button></div>
+          <div class="bnav"><button type="button" class="btn btn-ghost" onclick="goStep(1)">Back</button><button type="button" class="btn btn-primary" onclick="goStep(3)">Next</button></div>
         </div>
         <div class="bstep" data-step="3">
           <h3 class="bstep-t"><span>3</span>Your details</h3>
@@ -334,7 +334,7 @@ if (window.top !== window.self) { document.documentElement.style.display = 'none
           </div>
           <div class="field" id="guestEmailRow" hidden><label for="guestEmail">Email <span class="opt">(for your confirmation)</span></label><input id="guestEmail" type="email" maxlength="200" placeholder="you@email.com" autocomplete="email"></div>
           <div class="field-check" id="rewardsRow">
-            <input type="checkbox" id="join-rewards" checked>
+            <input type="checkbox" id="join-rewards" checked onchange="pop(this.checked ? 'Clean Rewards: on' : 'Clean Rewards: off', this.checked ? 'You’ll join free and get 10% off this booking.' : 'No problem, you can join any time.')">
             <label for="join-rewards">Join Clean Rewards (free): 10% off this first online booking and points on every clean</label>
           </div>
           <div class="bsummary" id="bSummary"></div>
@@ -349,7 +349,7 @@ if (window.top !== window.self) { document.documentElement.style.display = 'none
             <div class="guest-save-row"><input id="guestPw" type="password" placeholder="Choose a password (6+ characters)" autocomplete="new-password" aria-label="Choose a password"><button type="button" class="btn btn-primary" id="guestSaveBtn" onclick="saveGuestAccount()">Save</button></div>
             <p class="guest-save-msg" id="guestSaveMsg"></p>
           </div>
-          <div class="bnav"><button type="button" class="btn btn-ghost bback" onclick="bookStep(2)">Back</button><button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Request this date</button></div>
+          <div class="bnav"><button type="button" class="btn btn-ghost bback" onclick="goStep(2)">Back</button><button type="submit" class="btn btn-primary" id="bookingSubmitBtn" onclick="handleBookingSubmit()">Request this date</button></div>
         </div>
       </div>
     </form>
@@ -1287,6 +1287,74 @@ function rebook(id){
 }
 
 /* ---------------- Init ---------------- */
+
+/* ---------------- Popups for every booking action ----------------
+   pop(title, text, kind): kind 'step' fades away by itself; 'ok' and 'error' stay until OK is tapped. */
+let popTimer = null;
+function pop(title, text, kind){
+  kind = kind || 'step';
+  let box = document.getElementById('popBox');
+  if (!box) {
+    box = document.createElement('div'); box.id = 'popBox'; box.className = 'pop-wrap';
+    box.innerHTML = '<div class="pop-card" role="dialog" aria-modal="false" aria-live="polite"><span class="pop-icon" aria-hidden="true"></span><b class="pop-title"></b><p class="pop-text"></p><button type="button" class="btn btn-primary pop-ok">OK</button></div>';
+    document.body.appendChild(box);
+    box.addEventListener('click', e => { if (e.target === box || e.target.classList.contains('pop-ok')) closePop(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+  }
+  clearTimeout(popTimer);
+  box.className = 'pop-wrap open ' + kind;
+  box.querySelector('.pop-icon').textContent = kind === 'error' ? '!' : kind === 'ok' ? '✓' : 'i';
+  box.querySelector('.pop-title').textContent = title || '';
+  const t = box.querySelector('.pop-text'); t.textContent = text || ''; t.hidden = !text;
+  if (kind === 'step') popTimer = setTimeout(closePop, 2200);
+  else box.querySelector('.pop-ok').focus({ preventScroll: true });
+}
+function closePop(){ clearTimeout(popTimer); const b = document.getElementById('popBox'); if (b) b.classList.remove('open'); }
+
+const STEP_NAMES = { 1: 'What and when', 2: 'About your place', 3: 'Your details' };
+function goStep(n){
+  const before = Number((document.querySelector('.bstep.cur') || { dataset: { step: 1 } }).dataset.step);
+  bookStep(n);
+  const now = Number((document.querySelector('.bstep.cur') || { dataset: { step: 1 } }).dataset.step);
+  if (now === n) pop('Step ' + n + ' of 3: ' + STEP_NAMES[n], n === 2 ? 'Tell us the size of your place and anything we should know.' : n === 3 ? 'Add your name and how to reach you, then send.' : 'Pick a service, a day and a time.');
+  else if (now === before) pop('One more thing', stepProblem(1) || 'Finish this step first.', 'error');
+}
+// Wrap the taps: service, time, size, date, month arrows, "Book this" cards.
+(function(){
+  const _pick = pickChip, _date = selectDate, _month = changeMonth, _svc = bookService;
+  pickChip = function(group, val){
+    _pick(group, val);
+    if (group === 'svc') pop('Service: ' + val, selectedDate ? '' : 'Now pick a day on the calendar.');
+    if (group === 'win') pop('Time: ' + (val === 'any' ? 'Either is fine' : WINDOWS[val][0] + ', ' + WINDOWS[val][1]), 'Tap Next when you’re ready.');
+    if (group === 'size') pop(bookingSize ? 'Size: ' + bookingSize : 'Size cleared', '');
+  };
+  selectDate = function(y, m, d){
+    _date(y, m, d);
+    const day = new Date(y, m, d).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    pop('Date: ' + day, bookingCal.windows && !bookingWin ? 'Now pick morning, afternoon or either.' : 'Tap Next when you’re ready.');
+  };
+  changeMonth = function(delta){
+    _month(delta);
+    pop('Showing ' + new Date(calYear, calMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), '');
+  };
+  bookService = function(svc){ _svc(svc); pop(svc + ' selected', 'Pick a day on the calendar below.'); };
+})();
+// Results (sent, missing info, failures, saves, changes): whatever message appears also pops up.
+(function(){
+  const watch = (id, decide) => {
+    const el = document.getElementById(id); if (!el) return;
+    new MutationObserver(() => {
+      const txt = (el.textContent || '').trim(); if (!txt) return;
+      const k = decide(el, txt); if (k) pop(k.title, txt.replace(/^(Sent!|Saved!)\s*/, ''), k.kind);
+    }).observe(el, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  };
+  const byClass = (el) => /\berror\b/.test(el.className) ? { title: 'Please check this', kind: 'error' } : /\bsuccess\b/.test(el.className) ? { title: 'Done', kind: 'ok' } : null;
+  const byWords = (el, t) => /✓|saved|sent|you’re in|joined|welcome/i.test(t) ? { title: 'Done', kind: 'ok' } : { title: 'Please check this', kind: 'error' };
+  watch('bookingMsg', (el, t) => { const k = byClass(el); if (k && k.kind === 'ok' && /^Sent!/.test(t)) k.title = 'Request sent'; return k; });
+  watch('calendarSelectedNote', el => /\berr\b/.test(el.className) ? { title: 'One more thing', kind: 'error' } : null);
+  watch('authMsg', byClass);
+  ['guestSaveMsg', 'chgMsg', 'joinNote', 'pNote'].forEach(id => watch(id, byWords));
+})();
 
 (function init(){
   const today = new Date();
